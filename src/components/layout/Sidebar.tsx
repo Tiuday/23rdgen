@@ -5,13 +5,13 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { label: 'Browse All',  href: '/browse' },
-  { label: 'Agents',     href: '/browse?category=agent' },
-  { label: 'Prompts',    href: '/browse?category=prompt' },
-  { label: 'Skills',     href: '/browse?category=skill' },
-  { label: 'Workflows',  href: '/browse?category=workflow' },
-  { label: 'Teams',      href: '/browse?category=team' },
-  { label: 'Creators',   href: '/creators' },
+  { label: 'Browse All',  href: '/browse',                  icon: '🗺' },
+  { label: 'Agents',      href: '/browse?category=agent',   icon: '🧙' },
+  { label: 'Prompts',     href: '/browse?category=prompt',  icon: '📜' },
+  { label: 'Skills',      href: '/browse?category=skill',   icon: '🔧' },
+  { label: 'Workflows',   href: '/browse?category=workflow', icon: '🎼' },
+  { label: 'Teams',       href: '/browse?category=team',    icon: '👥' },
+  { label: 'Creators',    href: '/creators',                icon: '⭐' },
 ]
 
 interface SidebarProps {
@@ -25,7 +25,6 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
 
   const isActive = (href: string) => {
     const path = href.split('?')[0]
-    // Query-param links (category filters) — only show active on exact path match
     if (href.includes('?')) return false
     return pathname === path || (path === '/browse' && pathname.startsWith('/browse'))
   }
@@ -46,7 +45,12 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
         >
           {imgErr ? (
-            <span className="text-sm font-semibold text-[#EDE8DF]">23rdGen</span>
+            <span
+              className="text-sm font-semibold text-[#EDE8DF]"
+              style={{ fontFamily: 'var(--font-ibm-mono), monospace' }}
+            >
+              23rdGen
+            </span>
           ) : (
             <>
               <div className="w-7 h-7 relative shrink-0">
@@ -61,7 +65,12 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
                   }}
                 />
               </div>
-              <span className="text-sm font-semibold text-[#EDE8DF]">23rdGen</span>
+              <span
+                className="text-sm font-semibold text-[#EDE8DF]"
+                style={{ fontFamily: 'var(--font-ibm-mono), monospace' }}
+              >
+                23rdGen
+              </span>
             </>
           )}
         </Link>
@@ -76,24 +85,28 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
               key={item.href + item.label}
               href={item.href}
               onClick={onClose}
-              className="sidebar-nav-link flex items-center text-sm py-2 rounded-lg transition-all duration-150"
-              style={
-                active
+              className="sidebar-nav-link flex items-center gap-2.5 text-sm py-2 transition-all duration-150"
+              style={{
+                fontFamily: 'var(--font-ibm-mono), monospace',
+                ...(active
                   ? {
                       color: '#A594C4',
                       background: 'rgba(124,106,158,0.08)',
-                      borderLeft: '2px solid #7C6B9E',
+                      borderLeft: '3px solid #7C6B9E',
                       paddingLeft: 10,
                       paddingRight: 12,
                     }
                   : {
                       color: 'rgba(237,232,223,0.55)',
-                      borderLeft: '2px solid transparent',
+                      borderLeft: '3px solid transparent',
                       paddingLeft: 10,
                       paddingRight: 12,
-                    }
-              }
+                    }),
+              }}
             >
+              <span style={{ fontSize: 14, lineHeight: 1, opacity: active ? 1 : 0.7 }}>
+                {item.icon}
+              </span>
               {item.label}
             </Link>
           )
@@ -106,6 +119,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           href="/login"
           onClick={onClose}
           className="text-xs text-[rgba(237,232,223,0.4)] hover:text-[rgba(237,232,223,0.65)] transition-colors"
+          style={{ fontFamily: 'var(--font-ibm-mono), monospace' }}
         >
           Log in
         </Link>
@@ -113,6 +127,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           href="/signup"
           onClick={onClose}
           className="text-xs text-[rgba(237,232,223,0.4)] hover:text-[rgba(237,232,223,0.65)] transition-colors"
+          style={{ fontFamily: 'var(--font-ibm-mono), monospace' }}
         >
           Sign up
         </Link>

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, DM_Serif_Display, IBM_Plex_Mono } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import AppShell from '@/components/layout/AppShell'
 import CustomCursor from '@/components/layout/CustomCursor'
@@ -8,6 +8,20 @@ import '../styles/tokens.css'
 
 const inter = Inter({
   variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const dmSerifDisplay = DM_Serif_Display({
+  variable: '--font-dm-serif',
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: '--font-ibm-mono',
+  weight: ['400', '500', '600'],
   subsets: ['latin'],
   display: 'swap',
 })
@@ -33,7 +47,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${dmSerifDisplay.variable} ${ibmPlexMono.variable} h-full`}
+      suppressHydrationWarning
+    >
       <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#EDE8DF] antialiased font-sans">
         <Providers>
           <CustomCursor />

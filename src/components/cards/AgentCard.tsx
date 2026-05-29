@@ -28,18 +28,27 @@ export default function AgentCard({ agent }: AgentCardProps) {
   const badge = BADGE[agent.category] ?? BADGE.agent
 
   return (
-    <div className="group flex flex-col gap-3 p-4 rounded-[14px] bg-[#1C1916] border border-[#2A2520] hover:border-[#332E28] hover:bg-[#242018] transition-all duration-200 cursor-pointer">
+    <div className="card-retro scroll-fade-up group flex flex-col gap-3 p-4 bg-[#1C1916] hover:bg-[#1E1B22] transition-colors duration-150 cursor-pointer">
       {/* Header */}
       <div className="flex items-start gap-3">
         <PixelAvatar category={agent.category} />
         <div className="flex-1 min-w-0 pt-0.5">
           <span
-            className="inline-block text-[10px] px-2 py-0.5 rounded-full border font-medium capitalize mb-1"
-            style={{ background: badge.bg, color: badge.text, borderColor: badge.border }}
+            className="inline-block text-[10px] px-2 py-0.5 border font-medium capitalize mb-1 tracking-[0.1em] uppercase"
+            style={{
+              background: badge.bg,
+              color: badge.text,
+              borderColor: badge.border,
+              fontFamily: 'var(--font-ibm-mono), monospace',
+              borderRadius: 0,
+            }}
           >
             {agent.category}
           </span>
-          <h3 className="text-sm font-semibold text-[#EDE8DF] leading-snug truncate">
+          <h3
+            className="text-sm font-semibold text-[#F0E6D0] leading-snug truncate"
+            style={{ fontFamily: 'var(--font-dm-serif), serif' }}
+          >
             {agent.title}
           </h3>
         </div>
@@ -52,16 +61,25 @@ export default function AgentCard({ agent }: AgentCardProps) {
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-auto pt-1">
-        <div className="flex items-center gap-1.5 text-xs text-[rgba(237,232,223,0.45)]">
+        <div
+          className="flex items-center gap-1.5 text-xs text-[rgba(237,232,223,0.45)]"
+          style={{ fontFamily: 'var(--font-ibm-mono), monospace' }}
+        >
           <span>{agent.deploy_count.toLocaleString()} deploys</span>
           <span>·</span>
           <span className="text-[#A594C4] font-medium">{agent.points_per_deploy}pts</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <button className="text-xs px-2.5 py-1 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.55)] hover:text-[#EDE8DF] hover:border-[rgba(237,232,223,0.2)] transition-colors">
+          <button
+            className="text-xs px-2.5 py-1 border border-[#332E28] text-[rgba(237,232,223,0.55)] hover:text-[#EDE8DF] hover:border-[rgba(237,232,223,0.2)] transition-colors"
+            style={{ borderRadius: 0, fontFamily: 'var(--font-ibm-mono), monospace' }}
+          >
             Copy
           </button>
-          <button className="text-xs px-2.5 py-1 rounded-full bg-[#7C6B9E] text-[#EDE8DF] hover:bg-[#A594C4] transition-colors">
+          <button
+            className="text-xs px-2.5 py-1 bg-[#7C6B9E] text-[#EDE8DF] hover:bg-[#A594C4] transition-colors"
+            style={{ borderRadius: 0, fontFamily: 'var(--font-ibm-mono), monospace' }}
+          >
             Deploy
           </button>
         </div>

@@ -20,6 +20,13 @@
   --rose-tint: rgba(140, 58, 86, 0.12);
   --slate: #3A4560;
   --slate-tint: rgba(58, 69, 96, 0.15);
+
+  /* Luxury warmth additions — use sparingly, one or two per component */
+  --aged-paper: #D4C9A8;        /* secondary text, muted labels */
+  --warm-ivory: #F0E6D0;        /* primary headings only */
+  --deep-mahogany: #2A1A0E;     /* card background alternative */
+  --tarnished-gold: #B8960C;    /* featured badges only */
+
   --radius-pill: 100px;
   --radius-card: 14px;
   --radius-input: 10px;

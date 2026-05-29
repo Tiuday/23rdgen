@@ -3,53 +3,150 @@ import { useState } from 'react'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 
+const PIXEL_CHARS = [
+  {
+    emoji: '🧙',
+    style: {
+      top: '18%',
+      left: '4%',
+      animation: 'drift-1 28s ease-in-out infinite',
+      animationDelay: '0s',
+    },
+  },
+  {
+    emoji: '🧝',
+    style: {
+      top: '8%',
+      right: '6%',
+      animation: 'drift-2 35s ease-in-out infinite',
+      animationDelay: '-10s',
+    },
+  },
+  {
+    emoji: '🧚',
+    style: {
+      bottom: '22%',
+      right: '4%',
+      animation: 'drift-3 30s ease-in-out infinite',
+      animationDelay: '-14s',
+    },
+  },
+  {
+    emoji: '🤖',
+    style: {
+      top: '52%',
+      left: '2%',
+      animation: 'drift-4 24s ease-in-out infinite',
+      animationDelay: '-6s',
+    },
+  },
+  {
+    emoji: '👾',
+    style: {
+      bottom: '12%',
+      left: '6%',
+      animation: 'drift-5 40s ease-in-out infinite',
+      animationDelay: '-20s',
+    },
+  },
+]
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <>
-      {/* Fixed background depth layer */}
+      {/* ── Layer 1: base background ──────────────────────────────── */}
       <div
         aria-hidden="true"
-        style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: -1 }}
+        style={{ position: 'fixed', inset: 0, background: '#0A0A0F', zIndex: -2, pointerEvents: 'none' }}
+      />
+
+      {/* ── Layer 2: dot grid ─────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: -1,
+          pointerEvents: 'none',
+          backgroundImage: 'radial-gradient(circle, rgba(124,106,158,0.12) 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+        }}
+      />
+
+      {/* ── Layer 3: ambient glows ────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none' }}
       >
-        {/* Top-right violet radial */}
         <div style={{
           position: 'absolute',
-          top: -200,
-          right: -200,
-          width: 600,
-          height: 600,
+          top: -100,
+          right: -100,
+          width: 500,
+          height: 500,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,106,158,0.06) 0%, transparent 70%)',
+          background: 'rgba(124,106,158,0.07)',
+          filter: 'blur(120px)',
         }} />
-        {/* Bottom-left ember radial */}
         <div style={{
           position: 'absolute',
-          bottom: -100,
-          left: -100,
-          width: 400,
-          height: 400,
+          bottom: -80,
+          left: -80,
+          width: 350,
+          height: 350,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(196,98,45,0.04) 0%, transparent 70%)',
+          background: 'rgba(196,98,45,0.05)',
+          filter: 'blur(100px)',
         }} />
-        {/* Noise texture */}
-        <svg
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03 }}
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <filter id="bg-noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#bg-noise)" />
-        </svg>
       </div>
+
+      {/* ── Layer 4: scanline overlay ─────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          opacity: 0.025,
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255,255,255,0.03) 2px,
+            rgba(255,255,255,0.03) 4px
+          )`,
+        }}
+      />
+
+      {/* ── Floating pixel characters ─────────────────────────────── */}
+      {PIXEL_CHARS.map((char) => (
+        <div
+          key={char.emoji}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            fontSize: 32,
+            zIndex: 2,
+            pointerEvents: 'none',
+            opacity: 0.4,
+            lineHeight: 1,
+            userSelect: 'none',
+            ...char.style,
+          }}
+        >
+          {char.emoji}
+        </div>
+      ))}
 
       <Navbar onMenuClick={() => setSidebarOpen(v => !v)} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <main className="flex-1 pt-14 md:ml-[240px] min-h-screen">
+      <main
+        className="flex-1 pt-14 md:ml-[240px] min-h-screen"
+        style={{ position: 'relative', zIndex: 10 }}
+      >
         {children}
       </main>
     </>
