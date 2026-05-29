@@ -82,14 +82,17 @@ Status: COMPLETE
 
 ---
 
-## Vercel Prep — 2026-05-29
-- pnpm build: **passed** (19 routes, zero TypeScript errors)
-- Fixes applied:
-  - 14 stub files given minimal valid exports (login/signup pages, auth callback, 9 API routes, dashboard, team-builder, agent/[slug] page, auth form components)
-  - `src/types/database.ts`: added `Relationships: []` to both tables; made `Views`/`Functions`/`Enums` use `{ [_: string]: never }` to conform with `GenericSchema`; explicit `Update` types instead of `Partial<Insert>`
-  - `src/app/browse/[id]/page.tsx`: cast supabase client to `any` for fire-and-forget deploy_count increment (Supabase v2.106 Update type inference limitation)
-- `.env.example`: confirmed present with all required keys (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_APP_URL`)
-- `next.config.ts`: present and valid (no changes needed)
-- `vercel.json`: not present (correct — Next.js 14+ on Vercel needs none)
-- No hardcoded localhost URLs in source code
-- Ready for Vercel deploy
+## Vercel Redeployment Prep — 2026-05-29
+- Build: **passed clean** (19 routes, 0 TypeScript errors, 0 warnings)
+- `vercel.json` created (framework: nextjs, buildCommand: pnpm build, installCommand: pnpm install, outputDirectory: .next)
+- Code audit complete:
+  - All 9 pages confirmed with valid default exports and correct `'use client'` directives
+  - Zero `console.log` statements in source
+  - All Supabase calls wrapped in try/catch with graceful fallback UI
+  - `.env.example` confirmed with all required keys (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY, ANTHROPIC_API_KEY, NEXT_PUBLIC_APP_URL)
+  - `.gitignore` confirmed covers .env*, .next/, node_modules
+  - Removed stale `pnpm` field from package.json (settings already in pnpm-workspace.yaml — eliminated build warning)
+  - `next.config.ts` updated with production security headers (X-Frame-Options: DENY, X-Content-Type-Options: nosniff)
+- Pushed to public repo: https://github.com/Tiuday/23rdgen.git
+- Domain to connect: 23rdgen.com
+- Status: ready for Vercel import
