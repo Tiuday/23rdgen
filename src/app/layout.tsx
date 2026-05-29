@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from '@/components/Providers'
-import Navbar from '@/components/layout/Navbar'
+import AppShell from '@/components/layout/AppShell'
+import CustomCursor from '@/components/layout/CustomCursor'
 import './globals.css'
 import '../styles/tokens.css'
 
@@ -33,12 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col bg-[#141210] text-[#EDE8DF] antialiased font-sans">
+      <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#EDE8DF] antialiased font-sans">
         <Providers>
-          <Navbar />
-          <main className="flex-1 pt-14">
+          <CustomCursor />
+          <AppShell>
             {children}
-          </main>
+          </AppShell>
         </Providers>
       </body>
     </html>

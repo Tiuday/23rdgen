@@ -84,16 +84,23 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden" style={{ minHeight: 540 }}>
-        {/* Radial gradient bg glow */}
+      {/* ── SEARCH BAR (top of main content) ─────────────────────────── */}
+      <div className="relative w-full border-b border-[rgba(124,106,158,0.08)]" style={{ background: 'rgba(10,10,15,0.6)' }}>
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <SearchBar onOpen={() => setSearchOpen(true)} className="w-full" />
+        </div>
+      </div>
+
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="relative w-full overflow-visible" style={{ minHeight: 500 }}>
+        {/* Radial gradient bg */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 60% 50% at 70% 40%, rgba(124,107,158,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 60% 55% at 68% 45%, rgba(124,107,158,0.13) 0%, transparent 68%)',
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-16 flex flex-col lg:flex-row items-center gap-12">
+        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-16 flex flex-col lg:flex-row items-center gap-12">
           {/* Left: text */}
           <div className="flex-1 text-center lg:text-left">
             <div
@@ -103,51 +110,81 @@ export default function HomePage() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#A594C4] animate-pulse" />
               Open marketplace for deployable intelligence
             </div>
+
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#EDE8DF] leading-[1.08] tracking-tight mb-5">
               Deploy
               <br />
-              <span style={{ color: '#A594C4' }}>Intelligence.</span>
+              {/* "Intelligence." shimmer animation */}
+              <span
+                style={{
+                  background: 'linear-gradient(90deg, #A594C4 0%, #EDE8DF 45%, #7C6A9E 70%, #A594C4 100%)',
+                  backgroundSize: '200% auto',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent',
+                  animation: 'text-shimmer 4s linear infinite',
+                }}
+              >
+                Intelligence.
+              </span>
               <br />
               Anywhere.
             </h1>
+
             <p className="text-base text-[rgba(237,232,223,0.55)] leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
               Browse thousands of AI agents, prompts, skills, and workflows. Copy any item into your AI system with one click. Earn points every time yours gets deployed.
             </p>
+
             <div className="flex flex-wrap items-center gap-3 justify-center lg:justify-start">
-              <Link
-                href="/browse"
-                className="px-6 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-medium text-sm hover:bg-[#A594C4] transition-colors"
-              >
-                Browse Agents
-              </Link>
+              {/* Browse Agents — primary with pulse ring */}
+              <span className="relative inline-flex">
+                {/* Pulse ring */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    width: '100%',
+                    height: '100%',
+                    border: '2px solid rgba(124,106,158,0.5)',
+                    borderRadius: '100px',
+                    animation: 'pulse-ring 3s ease-out infinite',
+                  }}
+                />
+                <Link
+                  href="/browse"
+                  className="btn-primary relative px-6 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-medium text-sm"
+                >
+                  Browse Agents
+                </Link>
+              </span>
+
+              {/* Upload Yours — ghost */}
               <Link
                 href="/upload"
-                className="px-6 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] font-medium text-sm hover:border-[rgba(237,232,223,0.3)] hover:text-[#EDE8DF] transition-colors"
+                className="btn-ghost px-6 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] font-medium text-sm hover:border-[rgba(124,106,158,0.5)] hover:text-[#EDE8DF]"
               >
                 Upload Yours
               </Link>
             </div>
           </div>
 
-          {/* Right: WizardMascot */}
-          <div className="shrink-0 flex items-center justify-center" style={{ width: 240, height: 320 }}>
+          {/* Right: WizardMascot (larger, with particles) */}
+          <div className="shrink-0 flex items-center justify-center" style={{ width: 300, height: 400 }}>
             <WizardMascot />
           </div>
-        </div>
-
-        {/* SearchBar below hero */}
-        <div className="relative max-w-6xl mx-auto px-6 pb-16 flex justify-center">
-          <SearchBar onOpen={() => setSearchOpen(true)} className="max-w-[680px]" />
         </div>
       </section>
 
       {/* ── BROWSE SECTION ───────────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <div className="flex gap-8">
-          {/* Sidebar */}
+          {/* Category filter sidebar */}
           <aside className="w-44 shrink-0 hidden md:block">
             <h2 className="text-[10px] text-[rgba(237,232,223,0.4)] uppercase tracking-widest mb-4">
-              Categories
+              Filter
             </h2>
             <nav className="flex flex-col gap-0.5">
               {SIDEBAR_CATEGORIES.map(cat => (
@@ -182,7 +219,7 @@ export default function HomePage() {
                   {filtered.length} results
                 </span>
               </h2>
-              <button className="text-xs text-[rgba(237,232,223,0.45)] hover:text-[#EDE8DF] transition-colors">
+              <button className="btn-ghost text-xs text-[rgba(237,232,223,0.45)] hover:text-[#EDE8DF] px-2 py-1 rounded">
                 Sort: Most Deployed ↓
               </button>
             </div>
@@ -210,7 +247,6 @@ export default function HomePage() {
           style={{ background: 'radial-gradient(ellipse 50% 60% at 20% 50%, rgba(124,107,158,0.1) 0%, transparent 65%)' }}
         />
         <div className="relative max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-12">
-          {/* Left text */}
           <div className="flex-1 text-center lg:text-left">
             <span className="inline-block text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full border mb-5" style={{ background: 'rgba(124,107,158,0.12)', borderColor: 'rgba(124,107,158,0.3)', color: '#A594C4' }}>
               Team Builder
@@ -225,13 +261,11 @@ export default function HomePage() {
             </p>
             <Link
               href="/team-builder"
-              className="inline-flex px-5 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium hover:bg-[#A594C4] transition-colors"
+              className="btn-primary inline-flex px-5 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium"
             >
               Try Team Builder
             </Link>
           </div>
-
-          {/* Right: team avatar mosaic */}
           <div className="shrink-0 flex flex-col gap-3">
             <div className="flex gap-3">
               {TEAM_MEMBERS.slice(0, 3).map(m => (
@@ -259,14 +293,13 @@ export default function HomePage() {
       {/* ── PROMPT CUSTOMISER FEATURE ─────────────────────────────────────── */}
       <section
         className="relative overflow-hidden border-t border-[#2A2520]"
-        style={{ background: '#141210' }}
+        style={{ background: '#0E0E16' }}
       >
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 50% 60% at 80% 50%, rgba(212,82,30,0.07) 0%, transparent 65%)' }}
         />
         <div className="relative max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row-reverse items-center gap-12">
-          {/* Right text */}
           <div className="flex-1 text-center lg:text-left">
             <span className="inline-block text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full border mb-5" style={{ background: 'rgba(212,82,30,0.08)', borderColor: 'rgba(212,82,30,0.25)', color: '#D4521E' }}>
               Prompt Customiser · Powered by Claude
@@ -281,13 +314,13 @@ export default function HomePage() {
             </p>
             <Link
               href="/browse"
-              className="inline-flex px-5 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] text-sm font-medium hover:border-[rgba(237,232,223,0.3)] hover:text-[#EDE8DF] transition-colors"
+              className="btn-ghost inline-flex px-5 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] text-sm font-medium hover:border-[rgba(124,106,158,0.4)] hover:text-[#EDE8DF]"
             >
               Browse &amp; Customise
             </Link>
           </div>
 
-          {/* Left: mock editor */}
+          {/* Mock editor */}
           <div className="shrink-0 w-full max-w-sm">
             <div className="rounded-[14px] bg-[#1C1916] border border-[#2A2520] overflow-hidden">
               <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[#2A2520]">
@@ -314,7 +347,7 @@ export default function HomePage() {
                     You are a B2B cold email specialist for SaaS companies. When given a prospect's company name and product category, write a 3-sentence email…
                   </div>
                 </div>
-                <button className="w-full py-2 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium hover:bg-[#A594C4] transition-colors">
+                <button className="btn-primary w-full py-2 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium">
                   Apply &amp; Deploy
                 </button>
               </div>
@@ -331,7 +364,7 @@ export default function HomePage() {
         </p>
         <Link
           href="/signup"
-          className="inline-flex px-7 py-3 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-semibold text-sm hover:bg-[#A594C4] transition-colors"
+          className="btn-primary inline-flex px-7 py-3 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-semibold text-sm"
         >
           Get started free
         </Link>

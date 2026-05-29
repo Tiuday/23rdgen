@@ -82,6 +82,27 @@ Status: COMPLETE
 
 ---
 
+## Session 4 — 2026-05-30
+Status: COMPLETE
+
+### Completed This Session
+- **Homepage redesign**: adopted two-panel layout (fixed 240px left sidebar + top navbar), search bar moved to top of main content area above hero
+- **AppShell** (`src/components/layout/AppShell.tsx`) — client component managing mobile sidebar state + rendering background depth layer (radial gradients + SVG noise texture)
+- **Sidebar** (`src/components/layout/Sidebar.tsx`) — fixed 240px on desktop, drawer on mobile; logo (from /public/inspiration/logo.png with text fallback); nav links (Browse All / Agents / Prompts / Skills / Workflows / Teams / Creators); active state: dusty violet left border + violet text; bottom auth links; hamburger toggle from Navbar
+- **Navbar** (`src/components/layout/Navbar.tsx`) — stripped to logo + auth buttons only (center nav links removed, moved to sidebar); spring `.btn-primary` / `.btn-ghost` classes on Sign up / Log in; logo loads from `/inspiration/logo.png` with text fallback
+- **CustomCursor** (`src/components/layout/CustomCursor.tsx`) — 8px violet dot + 28px lagging ring; lerp follow; hover expand (dot scales to 0, ring grows to 48px with violet fill); only active on `pointer: fine` devices
+- **WizardMascot** upgraded: SVG scaled to 240×321; 12 orbital particles (4px violet circles, 11 distinct CSS keyframe orbits, 4–8s durations, staggered delays); violet 400px radial glow behind wizard (blur 24px); 6 upward-drifting 2px sparks (white/violet alternating); 4 ember sparks from staff orb; floating animation updated to 3s
+- **Hero headline**: "Intelligence." gets CSS `text-shimmer` gradient animation (left-to-right, 4s loop)
+- **CTA buttons**: `btn-primary` spring system (scale 1.06 hover, scale 0.94 active, cubic-bezier spring); "Browse Agents" has pulse-ring animation (3s loop); "Upload Yours" uses `btn-ghost`
+- **Button system** (`src/app/globals.css`): `.btn-primary` and `.btn-ghost` global classes with `cubic-bezier(0.34, 1.56, 0.64, 1)` spring; applied to all buttons across homepage, navbar, feature sections
+- **Background depth**: base `#0A0A0F` (updated from `#141210`); top-right violet radial (600px, rgba 0.06); bottom-left ember radial (400px, rgba 0.04); SVG `feTurbulence` noise overlay (opacity 0.03)
+- **SearchBar** updated: placeholder "Search agents, prompts, skills, workflows..."; dark input `#0E0E16`; violet glow focus ring (`box-shadow`)
+- **Logo**: copied `inspiration/logo.png` → `public/inspiration/logo.png`; Navbar + Sidebar both load it with text fallback + `console.warn` on error
+- **Mobile**: sidebar collapses to hamburger (SVG icon in Navbar); overlay drawer with `bg-black/60` backdrop
+- **Build**: passes clean — 19 routes, 0 TypeScript errors
+
+---
+
 ## Vercel Redeployment Prep — 2026-05-29
 - Build: **passed clean** (19 routes, 0 TypeScript errors, 0 warnings)
 - `vercel.json` created (framework: nextjs, buildCommand: pnpm build, installCommand: pnpm install, outputDirectory: .next)
