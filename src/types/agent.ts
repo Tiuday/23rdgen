@@ -4,29 +4,22 @@ export type CompatiblePlatform = 'claude' | 'chatgpt' | 'gemini' | 'n8n' | 'othe
 
 export type AgentStatus = 'active' | 'draft' | 'archived'
 
+// Core agent shape matching the Supabase agents table
 export interface Agent {
   id: string
-  slug: string
-  title: string
-  description: string
-  content: string
+  name: string
   category: AgentCategory
-  tags: string[]
-  compatible_with: CompatiblePlatform[]
-  creator_id: string
-  pixel_character: string
+  description: string
+  long_description?: string | null
+  content: string
+  creator_name: string
   deploy_count: number
-  points_per_deploy: number
-  is_free: boolean
-  is_featured: boolean
-  quality_score: number
-  gemini_tags: string[]
-  gemini_score: number
-  status: AgentStatus
+  rating: number
+  tags: string[]
   created_at: string
-  updated_at: string
 }
 
+// Extended with creator profile join
 export interface AgentWithCreator extends Agent {
   profiles: {
     username: string
@@ -37,12 +30,11 @@ export interface AgentWithCreator extends Agent {
 }
 
 export interface CreateAgentInput {
-  title: string
+  name: string
   description: string
+  long_description?: string
   content: string
   category: AgentCategory
-  tags: string[]
-  compatible_with: CompatiblePlatform[]
-  pixel_character: string
-  is_free?: boolean
+  creator_name: string
+  tags?: string[]
 }

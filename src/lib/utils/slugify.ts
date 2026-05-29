@@ -1,9 +1,1 @@
-import slugifyLib from 'slugify'
-
-export function slugify(text: string): string {
-  return slugifyLib(text, {
-    lower: true,
-    strict: true,
-    trim: true,
-  })
-}
+export { slugify } from '@/lib/utils'

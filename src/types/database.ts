@@ -26,25 +26,40 @@ export interface Database {
           points_available?: number
           created_at?: string
         }
-        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
+        Update: {
+          id?: string
+          username?: string
+          display_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          pixel_character?: string
+          points_total?: number
+          points_available?: number
+          created_at?: string
+        }
+        Relationships: []
       }
       agents: {
         Row: {
           id: string
           slug: string
           title: string
+          name: string | null
           description: string
+          long_description: string | null
           content: string
           category: string
           tags: string[]
           compatible_with: string[]
-          creator_id: string
-          pixel_character: string
+          creator_id: string | null
+          creator_name: string | null
+          pixel_character: string | null
           deploy_count: number
           points_per_deploy: number
           is_free: boolean
           is_featured: boolean
           quality_score: number
+          rating: number
           gemini_tags: string[]
           gemini_score: number
           status: string
@@ -53,31 +68,61 @@ export interface Database {
         }
         Insert: {
           id?: string
-          slug: string
-          title: string
+          slug?: string
+          title?: string
+          name?: string | null
           description: string
+          long_description?: string | null
           content: string
           category: string
           tags?: string[]
           compatible_with?: string[]
-          creator_id: string
-          pixel_character: string
+          creator_id?: string | null
+          creator_name?: string | null
+          pixel_character?: string | null
           deploy_count?: number
           points_per_deploy?: number
           is_free?: boolean
           is_featured?: boolean
           quality_score?: number
+          rating?: number
           gemini_tags?: string[]
           gemini_score?: number
           status?: string
           created_at?: string
           updated_at?: string
         }
-        Update: Partial<Database['public']['Tables']['agents']['Insert']>
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          name?: string | null
+          description?: string
+          long_description?: string | null
+          content?: string
+          category?: string
+          tags?: string[]
+          compatible_with?: string[]
+          creator_id?: string | null
+          creator_name?: string | null
+          pixel_character?: string | null
+          deploy_count?: number
+          points_per_deploy?: number
+          is_free?: boolean
+          is_featured?: boolean
+          quality_score?: number
+          rating?: number
+          gemini_tags?: string[]
+          gemini_score?: number
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
-    Enums: Record<string, never>
+    Views: { [_: string]: never }
+    Functions: { [_: string]: never }
+    Enums: { [_: string]: never }
   }
 }
