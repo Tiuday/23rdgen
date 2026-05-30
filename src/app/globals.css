@@ -340,12 +340,22 @@
   50%       { transform: translateY(-3px); }
 }
 
+/* ── TreeRoots pulse ────────────────────────────────────────────────── */
+@keyframes rootPulse {
+  0%,100% { transform: translateY(0px) scaleX(1); }
+  50% { transform: translateY(4px) scaleX(1.003); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #E8E0D0;
+    background-image: radial-gradient(circle, #A89880 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
+    color: #EDE8DF;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: auto;

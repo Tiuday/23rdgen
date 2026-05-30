@@ -61,7 +61,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#EDE8DF] antialiased font-sans">
+      <body className="min-h-full flex flex-col antialiased font-sans">
         <Providers>
           <AppShell>
             {children}
