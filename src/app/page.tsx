@@ -1,376 +1,494 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import WizardMascot from '@/components/mascot/WizardMascot'
-import SearchBar from '@/components/search/SearchBar'
+import Image from 'next/image'
 import SearchModal from '@/components/search/SearchModal'
-import AgentCard from '@/components/cards/AgentCard'
-import PixelAvatar from '@/components/mascot/PixelAvatar'
-import type { AgentCategory } from '@/types/agent'
 
-// ─── Mock data ─────────────────────────────────────────────────────────────────
-
-const MOCK_AGENTS = [
-  {
-    id: '1', title: 'Code Review Pro',
-    description: 'Deeply analyzes pull requests for bugs, security issues, and code quality improvements. Works with any language.',
-    category: 'agent' as AgentCategory, deploy_count: 2840, points_per_deploy: 10, creator: 'devtools',
-  },
-  {
-    id: '2', title: 'SEO Content Writer',
-    description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a keyword list.',
-    category: 'prompt' as AgentCategory, deploy_count: 1650, points_per_deploy: 10, creator: 'marketers',
-  },
-  {
-    id: '3', title: 'SQL Query Builder',
-    description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite. Explains every query.',
-    category: 'skill' as AgentCategory, deploy_count: 3200, points_per_deploy: 10, creator: 'dataeng',
-  },
-  {
-    id: '4', title: 'Research Pipeline',
-    description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',
-    category: 'workflow' as AgentCategory, deploy_count: 890, points_per_deploy: 10, creator: 'researchers',
-  },
-  {
-    id: '5', title: 'Startup Launch Team',
-    description: 'Pre-configured team of agents: Copywriter, Developer, Designer, and Growth Analyst — all in sync.',
-    category: 'team' as AgentCategory, deploy_count: 450, points_per_deploy: 10, creator: 'founders',
-  },
-  {
-    id: '6', title: 'Browser Automator',
-    description: 'Automates repetitive browser tasks: form filling, data scraping, screenshot capture, and navigation.',
-    category: 'browser' as AgentCategory, deploy_count: 1100, points_per_deploy: 10, creator: 'automators',
-  },
-  {
-    id: '7', title: 'Email Campaign AI',
-    description: 'Writes personalized cold emails and follow-up sequences optimized for high open and reply rates.',
-    category: 'prompt' as AgentCategory, deploy_count: 2100, points_per_deploy: 10, creator: 'salesteam',
-  },
-  {
-    id: '8', title: 'Data Analysis Agent',
-    description: 'Analyzes CSV and JSON datasets, produces summaries, chart recommendations, and plain-language insights.',
-    category: 'agent' as AgentCategory, deploy_count: 1750, points_per_deploy: 10, creator: 'analysts',
-  },
+const NAV_ITEMS = [
+  { label: 'Browse All', href: '/browse' },
+  { label: 'Agents', href: '/browse?category=agent' },
+  { label: 'Prompts', href: '/browse?category=prompt' },
+  { label: 'Skills', href: '/browse?category=skill' },
+  { label: 'Workflows', href: '/browse?category=workflow' },
+  { label: 'Teams', href: '/browse?category=team' },
+  { label: 'Creators', href: '/browse?category=creator' },
 ]
 
-const SIDEBAR_CATEGORIES: { id: AgentCategory | 'all'; label: string; color: string }[] = [
-  { id: 'all',      label: 'All',       color: '#EDE8DF' },
-  { id: 'agent',    label: 'Agents',    color: '#D4521E' },
-  { id: 'prompt',   label: 'Prompts',   color: '#7C6B9E' },
-  { id: 'skill',    label: 'Skills',    color: '#3A6B45' },
-  { id: 'workflow', label: 'Workflows', color: '#C4785A' },
-  { id: 'team',     label: 'Teams',     color: '#8C3A56' },
-  { id: 'browser',  label: 'Browser',   color: '#3A4560' },
+const TICKER_ITEMS = ['Claude', 'ChatGPT', 'Gemini', 'n8n', 'Cursor', 'Windsurf', 'Make', 'Zapier']
+
+// Dot-leaf positions in SVG viewBox "0 0 520 700"
+const LEAF_DOTS: { x: number; y: number }[] = [
+  // Far-left cluster (branch tips ~x 2–44, y 58–148)
+  { x: 22, y: 148 }, { x: 8,  y: 72  }, { x: 44, y: 62  }, { x: 4,  y: 92  },
+  { x: 6,  y: 132 }, { x: 74, y: 130 }, { x: 35, y: 100 }, { x: 18, y: 58  },
+  // Left-upper branch tips
+  { x: 42, y: 160 }, { x: 26, y: 106 }, { x: 68, y: 78  }, { x: 67, y: 195 },
+  { x: 38, y: 164 }, { x: 78, y: 168 },
+  // Left-mid branch tips
+  { x: 44, y: 220 }, { x: 6,  y: 130 }, { x: 74, y: 132 }, { x: 88, y: 263 },
+  { x: 34, y: 140 }, { x: 76, y: 138 }, { x: 118, y: 136 },
+  // Left-lower branch tips
+  { x: 72, y: 315 }, { x: 15, y: 228 }, { x: 105, y: 224 }, { x: 62, y: 276 },
+  // Far-right cluster (branch tips ~x 430–494, y 60–155)
+  { x: 452, y: 155 }, { x: 472, y: 62  }, { x: 430, y: 62  }, { x: 474, y: 92  },
+  { x: 464, y: 72  }, { x: 404, y: 72  }, { x: 430, y: 124 }, { x: 418, y: 122 },
+  // Right-upper branch tips
+  { x: 434, y: 162 }, { x: 455, y: 120 }, { x: 422, y: 170 }, { x: 462, y: 172 },
+  // Right-mid branch tips
+  { x: 444, y: 216 }, { x: 474, y: 122 }, { x: 414, y: 122 }, { x: 380, y: 122 },
+  { x: 476, y: 120 }, { x: 460, y: 122 }, { x: 494, y: 114 },
+  // Right-lower branch tips
+  { x: 430, y: 305 }, { x: 477, y: 212 }, { x: 400, y: 215 }, { x: 427, y: 248 },
+  { x: 395, y: 343 }, { x: 384, y: 120 }, { x: 424, y: 120 },
+  // Mid-upper scattered along branches
+  { x: 158, y: 403 }, { x: 340, y: 389 }, { x: 138, y: 324 }, { x: 365, y: 314 },
+  { x: 138, y: 266 }, { x: 357, y: 262 }, { x: 122, y: 245 }, { x: 370, y: 252 },
+  { x: 158, y: 339 }, { x: 350, y: 326 },
+  // Mid-branch fill
+  { x: 102, y: 271 }, { x: 183, y: 361 }, { x: 312, y: 359 }, { x: 402, y: 272 },
+  { x: 52,  y: 192 }, { x: 462, y: 186 }, { x: 437, y: 171 }, { x: 58,  y: 249 },
+  { x: 442, y: 244 }, { x: 82,  y: 216 }, { x: 438, y: 210 },
 ]
 
-const TEAM_MEMBERS: { category: AgentCategory; label: string }[] = [
-  { category: 'agent',    label: 'Researcher' },
-  { category: 'prompt',   label: 'Copywriter' },
-  { category: 'skill',    label: 'Coder' },
-  { category: 'workflow', label: 'Planner' },
-  { category: 'browser',  label: 'Scraper' },
-  { category: 'team',     label: 'Manager' },
-]
+function AnimatedTree() {
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-end' }}>
+      <svg
+        viewBox="0 0 520 700"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMax meet"
+        style={{
+          display: 'block',
+          animation: 'tree-sway 4.5s ease-in-out infinite',
+          transformOrigin: '50% 100%',
+        }}
+      >
+        {/* ── Trunk (tapering) ──────────────────────────────────────── */}
+        <path d="M 260 700 C 258 672 254 640 257 608 C 260 576 264 550 261 518"
+          stroke="#0A0A0F" strokeWidth="22" fill="none" strokeLinecap="round"/>
+        <path d="M 261 518 C 258 488 255 464 258 432 C 261 408 262 388 260 362"
+          stroke="#0A0A0F" strokeWidth="14" fill="none" strokeLinecap="round"/>
+        <path d="M 260 362 C 258 344 256 330 258 312"
+          stroke="#0A0A0F" strokeWidth="8"  fill="none" strokeLinecap="round"/>
 
-// ─── Component ─────────────────────────────────────────────────────────────────
+        {/* ── Main branches ─────────────────────────────────────────── */}
+        <path d="M 260 475 C 232 452 195 428 160 400 C 128 374 98 344 70 312"
+          stroke="#0A0A0F" strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M 262 462 C 290 436 322 410 354 383 C 382 358 410 330 438 302"
+          stroke="#0A0A0F" strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M 260 430 C 225 398 182 360 145 325 C 112 292 78 255 45 220"
+          stroke="#0A0A0F" strokeWidth="9"  fill="none" strokeLinecap="round"/>
+        <path d="M 260 418 C 295 386 335 350 368 316 C 398 284 425 250 448 216"
+          stroke="#0A0A0F" strokeWidth="9"  fill="none" strokeLinecap="round"/>
+        <path d="M 258 385 C 220 348 175 305 138 266 C 104 230 68 194 40 160"
+          stroke="#0A0A0F" strokeWidth="7"  fill="none" strokeLinecap="round"/>
+        <path d="M 262 378 C 298 342 335 300 368 263 C 398 230 428 196 452 162"
+          stroke="#0A0A0F" strokeWidth="7"  fill="none" strokeLinecap="round"/>
+        <path d="M 258 358 C 218 320 172 278 128 243 C 88 212 52 180 22 148"
+          stroke="#0A0A0F" strokeWidth="5"  fill="none" strokeLinecap="round"/>
+        <path d="M 262 352 C 302 315 342 276 378 244 C 410 215 440 184 465 153"
+          stroke="#0A0A0F" strokeWidth="5"  fill="none" strokeLinecap="round"/>
+
+        {/* ── Secondary branches ────────────────────────────────────── */}
+        {/* From lower-left end */}
+        <path d="M 70 312 C 50 284 30 254 14 224"  stroke="#0A0A0F" strokeWidth="5" fill="none" strokeLinecap="round"/>
+        <path d="M 70 312 C 86 283 98 252 105 222" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M 120 368 C 98 336 78 302 60 272" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        {/* From lower-right end */}
+        <path d="M 438 302 C 458 272 472 240 478 208" stroke="#0A0A0F" strokeWidth="5" fill="none" strokeLinecap="round"/>
+        <path d="M 438 302 C 420 272 412 242 408 212" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M 398 342 C 415 310 424 276 428 246" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        {/* From mid-left end */}
+        <path d="M 45 220 C 25 190 10 158 6 128"   stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M 45 220 C 62 190 72 158 74 128"  stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M 90 262 C 68 228 50 194 42 162"  stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* From mid-right end */}
+        <path d="M 448 216 C 464 184 474 152 476 120" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M 448 216 C 430 184 420 152 418 120" stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* From upper-left end */}
+        <path d="M 40 160 C 22 130 12 100 8 70"   stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M 40 160 C 58 130 68 100 66 70"  stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M 68 196 C 50 164 36 130 32 98"  stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        {/* From upper-right end */}
+        <path d="M 452 162 C 466 130 474 100 472 70" stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M 452 162 C 434 130 424 100 422 70" stroke="#0A0A0F" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* From far-left end */}
+        <path d="M 22 148 C 8 118 4 86 6 58"     stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 22 148 C 40 118 48 86 44 58"  stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        {/* From far-right end */}
+        <path d="M 465 153 C 478 122 485 90 482 60" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 465 153 C 448 122 440 90 442 60" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+
+        {/* ── Tertiary twigs ────────────────────────────────────────── */}
+        <path d="M 14 224 C 2 194 2 162 4 132"    stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 14 224 C 30 194 36 162 32 132" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 105 222 C 90 192 80 160 78 130"   stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 105 222 C 118 192 122 160 118 130" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 478 208 C 492 176 498 144 494 112" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 478 208 C 464 176 458 144 460 112" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 408 212 C 393 180 385 148 384 118" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 408 212 C 422 180 428 148 424 118" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+
+        {/* ── Animated violet dot-leaves ────────────────────────────── */}
+        {LEAF_DOTS.map((dot, i) => (
+          <circle
+            key={i}
+            cx={dot.x}
+            cy={dot.y}
+            r={i % 3 === 0 ? 5 : i % 3 === 1 ? 4 : 3.5}
+            fill="#7C6A9E"
+            style={{
+              opacity: 0.72,
+              animation: `leaf-float ${2.8 + (i % 7) * 0.38}s ease-in-out infinite`,
+              animationDelay: `${(i * 0.17) % 3.4}s`,
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  )
+}
 
 export default function HomePage() {
   const [searchOpen, setSearchOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<AgentCategory | 'all'>('all')
-
-  const filtered = activeCategory === 'all'
-    ? MOCK_AGENTS
-    : MOCK_AGENTS.filter(a => a.category === activeCategory)
+  const [imgErr, setImgErr]         = useState(false)
 
   return (
     <>
-      {/* ── SEARCH BAR (top of main content) ─────────────────────────── */}
-      <div className="relative w-full border-b border-[rgba(124,106,158,0.08)]" style={{ background: 'rgba(10,10,15,0.6)' }}>
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <SearchBar onOpen={() => setSearchOpen(true)} className="w-full" />
-        </div>
-      </div>
+      {/* ── Responsive overrides ──────────────────────────────────── */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .hero-grid   { grid-template-columns: 1fr !important; }
+          .tree-col    { display: none !important; }
+          .hero-left   { max-width: 560px !important; margin: 0 auto !important; text-align: center !important; }
+          .hero-search { margin-left: auto !important; margin-right: auto !important; }
+          .hero-btns   { justify-content: center !important; }
+        }
+        @media (max-width: 768px) {
+          .nav-links   { display: none !important; }
+          .hero-h1     { font-size: clamp(40px, 12vw, 64px) !important; }
+        }
+      `}</style>
 
-      {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-visible" style={{ minHeight: 500 }}>
-        {/* Radial gradient bg */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 60% 55% at 68% 45%, rgba(124,107,158,0.13) 0%, transparent 68%)',
-          }}
-        />
-        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-16 flex flex-col lg:flex-row items-center gap-12">
-          {/* Left: text */}
-          <div className="flex-1 text-center lg:text-left">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs mb-6"
-              style={{ background: 'rgba(124,107,158,0.1)', borderColor: 'rgba(124,107,158,0.3)', color: '#A594C4' }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#A594C4] animate-pulse" />
-              Open marketplace for deployable intelligence
+      {/* ── Parchment background ──────────────────────────────────── */}
+      <div aria-hidden="true" style={{
+        position: 'fixed', inset: 0, background: '#E8E0D0', zIndex: 0, pointerEvents: 'none',
+      }} />
+
+      {/* ── Dot grid overlay ──────────────────────────────────────── */}
+      <div aria-hidden="true" style={{
+        position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
+        backgroundImage: 'radial-gradient(circle, #C4B9A0 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+        opacity: 0.45,
+      }} />
+
+      {/* ── TOP NAVIGATION ────────────────────────────────────────── */}
+      <nav style={{
+        position:       'fixed',
+        top:            0,
+        left:           0,
+        right:          0,
+        zIndex:         50,
+        height:         56,
+        background:     'rgba(232,224,208,0.96)',
+        backdropFilter: 'blur(8px)',
+        borderBottom:   '1px solid rgba(10,10,15,0.1)',
+        display:        'flex',
+        alignItems:     'center',
+        padding:        '0 28px',
+        gap:            0,
+      }}>
+        {/* Logo */}
+        <Link href="/" style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          marginRight: 28, textDecoration: 'none', flexShrink: 0,
+        }}>
+          {imgErr ? (
+            <span style={{
+              fontSize: 15, fontWeight: 700, color: '#0A0A0F',
+              fontFamily: 'var(--font-dm-serif), DM Serif Display, serif',
+            }}>23rdGen</span>
+          ) : (
+            <div style={{ width: 28, height: 28, position: 'relative', flexShrink: 0 }}>
+              <Image src="/inspiration/logo.png" alt="23rdGen" fill
+                style={{ objectFit: 'contain' }} onError={() => setImgErr(true)} />
             </div>
+          )}
+        </Link>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#EDE8DF] leading-[1.08] tracking-tight mb-5">
-              Deploy
-              <br />
-              {/* "Intelligence." shimmer animation */}
-              <span
-                style={{
-                  background: 'linear-gradient(90deg, #A594C4 0%, #EDE8DF 45%, #7C6A9E 70%, #A594C4 100%)',
-                  backgroundSize: '200% auto',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  color: 'transparent',
-                  WebkitTextFillColor: 'transparent',
-                  animation: 'text-shimmer 4s linear infinite',
-                }}
-              >
-                Intelligence.
-              </span>
-              <br />
-              Anywhere.
+        {/* Nav links */}
+        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2 }}>
+          {NAV_ITEMS.map(item => (
+            <Link key={item.href} href={item.href} style={{
+              fontSize: 12,
+              fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
+              color: 'rgba(10,10,15,0.6)',
+              textDecoration: 'none',
+              padding: '6px 11px',
+              letterSpacing: '0.02em',
+              whiteSpace: 'nowrap',
+              transition: 'color 120ms',
+            }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#0A0A0F')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(10,10,15,0.6)')}
+            >{item.label}</Link>
+          ))}
+        </div>
+
+        {/* Auth buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <Link href="/login" style={{
+            fontSize: 12,
+            fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
+            color: '#0A0A0F',
+            textDecoration: 'none',
+            padding: '7px 16px',
+            border: '2px solid #0A0A0F',
+            boxShadow: '2px 2px 0px #0A0A0F',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontWeight: 500,
+            transition: 'box-shadow 80ms, transform 80ms',
+            background: 'transparent',
+          }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '1px 1px 0px #0A0A0F'; el.style.transform = 'translate(1px,1px)' }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '2px 2px 0px #0A0A0F'; el.style.transform = 'translate(0,0)' }}
+          >Log in</Link>
+
+          <Link href="/signup" style={{
+            fontSize: 12,
+            fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
+            color: '#E8E0D0',
+            background: '#7C6A9E',
+            textDecoration: 'none',
+            padding: '7px 16px',
+            border: '2px solid #0A0A0F',
+            boxShadow: '2px 2px 0px #0A0A0F',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontWeight: 500,
+            transition: 'box-shadow 80ms, transform 80ms',
+          }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '1px 1px 0px #0A0A0F'; el.style.transform = 'translate(1px,1px)' }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '2px 2px 0px #0A0A0F'; el.style.transform = 'translate(0,0)' }}
+          >Sign up</Link>
+        </div>
+      </nav>
+
+      {/* ── HERO SECTION ──────────────────────────────────────────── */}
+      <section style={{
+        position:      'relative',
+        zIndex:        1,
+        minHeight:     '100vh',
+        display:       'flex',
+        alignItems:    'center',
+        paddingTop:    56,
+        paddingBottom: 56,
+      }}>
+        <div className="hero-grid" style={{
+          width:               '100%',
+          maxWidth:            1320,
+          margin:              '0 auto',
+          padding:             '0 48px',
+          display:             'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap:                 64,
+          alignItems:          'center',
+        }}>
+
+          {/* ── LEFT COLUMN ─────────────────────────────────────── */}
+          <div className="hero-left">
+            <h1 className="hero-h1" style={{
+              fontFamily:  'var(--font-dm-serif), DM Serif Display, serif',
+              fontSize:    'clamp(52px, 5.5vw, 88px)',
+              lineHeight:  1.04,
+              color:       '#0A0A0F',
+              margin:      '0 0 22px 0',
+              letterSpacing: '-0.01em',
+              fontWeight:  400,
+            }}>
+              Step Into<br />
+              Artificial<br />
+              Consciousness.
             </h1>
 
-            <p className="text-base text-[rgba(237,232,223,0.55)] leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
-              Browse thousands of AI agents, prompts, skills, and workflows. Copy any item into your AI system with one click. Earn points every time yours gets deployed.
+            <p style={{
+              fontFamily:  'var(--font-ibm-mono), IBM Plex Mono, monospace',
+              fontSize:    14,
+              lineHeight:  1.75,
+              color:       'rgba(10,10,15,0.52)',
+              margin:      '0 0 28px 0',
+              maxWidth:    420,
+            }}>
+              Create AI agents, agentic teams, workflows and skills.<br />
+              Embed them into your work. Save time. Earn automatically.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 justify-center lg:justify-start">
-              {/* Browse Agents — primary with pulse ring */}
-              <span className="relative inline-flex">
-                {/* Pulse ring */}
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    top: '50%',
-                    left: '50%',
-                    width: '100%',
-                    height: '100%',
-                    border: '2px solid rgba(124,106,158,0.5)',
-                    borderRadius: '100px',
-                    animation: 'pulse-ring 3s ease-out infinite',
-                  }}
-                />
-                <Link
-                  href="/browse"
-                  className="btn-primary relative px-6 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-medium text-sm"
-                >
-                  Browse Agents
-                </Link>
+            {/* Search bar */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="hero-search"
+              style={{
+                display:     'flex',
+                alignItems:  'center',
+                gap:         10,
+                width:       '100%',
+                maxWidth:    440,
+                height:      50,
+                padding:     '0 16px',
+                background:  '#F0E6D0',
+                border:      '2px solid #0A0A0F',
+                boxShadow:   '3px 3px 0px #0A0A0F',
+                borderRadius: 0,
+                cursor:      'text',
+                marginBottom: 22,
+                fontFamily:  'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                transition:  'box-shadow 80ms, transform 80ms',
+              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '1px 1px 0px #0A0A0F'; el.style.transform = 'translate(2px,2px)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '3px 3px 0px #0A0A0F'; el.style.transform = 'translate(0,0)' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{ flexShrink: 0, opacity: 0.4 }}>
+                <circle cx="6.5" cy="6.5" r="5" stroke="#0A0A0F" strokeWidth="1.5"/>
+                <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0F" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <span style={{
+                flex: 1, textAlign: 'left', fontSize: 13,
+                color: 'rgba(10,10,15,0.38)', letterSpacing: '0.01em',
+              }}>
+                Search agents, prompts, skills, workflows...
               </span>
+              <kbd style={{
+                display: 'flex', alignItems: 'center', gap: 2,
+                padding: '3px 8px',
+                background: '#E8E0D0',
+                border: '2px solid #0A0A0F',
+                borderRadius: 0,
+                fontSize: 11,
+                color: 'rgba(10,10,15,0.45)',
+                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                flexShrink: 0,
+              }}>⌘K</kbd>
+            </button>
 
-              {/* Upload Yours — ghost */}
-              <Link
-                href="/upload"
-                className="btn-ghost px-6 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] font-medium text-sm hover:border-[rgba(124,106,158,0.5)] hover:text-[#EDE8DF]"
+            {/* CTA buttons */}
+            <div className="hero-btns" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <Link href="/browse" style={{
+                display:         'inline-flex',
+                alignItems:      'center',
+                justifyContent:  'center',
+                fontFamily:      'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                fontSize:        12,
+                fontWeight:      600,
+                letterSpacing:   '0.09em',
+                textTransform:   'uppercase',
+                textDecoration:  'none',
+                color:           '#E8E0D0',
+                background:      '#7C6A9E',
+                border:          '2px solid #0A0A0F',
+                boxShadow:       '3px 3px 0px #0A0A0F',
+                borderRadius:    0,
+                padding:         '12px 28px',
+                transition:      'box-shadow 80ms, transform 80ms',
+              }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '1px 1px 0px #0A0A0F'; el.style.transform = 'translate(2px,2px)' }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '3px 3px 0px #0A0A0F'; el.style.transform = 'translate(0,0)' }}
+              >
+                Browse Agents
+              </Link>
+
+              <Link href="/upload" style={{
+                display:         'inline-flex',
+                alignItems:      'center',
+                justifyContent:  'center',
+                fontFamily:      'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                fontSize:        12,
+                fontWeight:      600,
+                letterSpacing:   '0.09em',
+                textTransform:   'uppercase',
+                textDecoration:  'none',
+                color:           '#0A0A0F',
+                background:      '#F0E6D0',
+                border:          '2px solid #0A0A0F',
+                boxShadow:       '3px 3px 0px #0A0A0F',
+                borderRadius:    0,
+                padding:         '12px 28px',
+                transition:      'box-shadow 80ms, transform 80ms',
+              }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '1px 1px 0px #0A0A0F'; el.style.transform = 'translate(2px,2px)' }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = '3px 3px 0px #0A0A0F'; el.style.transform = 'translate(0,0)' }}
               >
                 Upload Yours
               </Link>
             </div>
           </div>
 
-          {/* Right: WizardMascot (larger, with particles) */}
-          <div className="shrink-0 flex items-center justify-center" style={{ width: 300, height: 400 }}>
-            <WizardMascot />
+          {/* ── RIGHT COLUMN: Animated SVG Tree ─────────────────── */}
+          <div className="tree-col" style={{ height: 'min(640px, 78vh)', display: 'flex', alignItems: 'flex-end' }}>
+            <AnimatedTree />
           </div>
         </div>
       </section>
 
-      {/* ── BROWSE SECTION ───────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="flex gap-8">
-          {/* Category filter sidebar */}
-          <aside className="w-44 shrink-0 hidden md:block">
-            <h2 className="text-[10px] text-[rgba(237,232,223,0.4)] uppercase tracking-widest mb-4">
-              Filter
-            </h2>
-            <nav className="flex flex-col gap-0.5">
-              {SIDEBAR_CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className="flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg transition-colors text-left"
-                  style={
-                    activeCategory === cat.id
-                      ? { background: 'rgba(124,107,158,0.15)', color: '#EDE8DF' }
-                      : { color: 'rgba(237,232,223,0.55)' }
-                  }
-                >
-                  {cat.id !== 'all' && (
-                    <span
-                      className="w-2 h-2 rounded-sm shrink-0"
-                      style={{ background: cat.color, opacity: activeCategory === cat.id ? 1 : 0.6 }}
-                    />
+      {/* ── BOTTOM TICKER ─────────────────────────────────────────── */}
+      <div style={{
+        position:   'fixed',
+        bottom:     0,
+        left:       0,
+        right:      0,
+        zIndex:     50,
+        height:     44,
+        background: '#0A0A0F',
+        borderTop:  '1px solid #7C6A9E',
+        display:    'flex',
+        alignItems: 'center',
+        overflow:   'hidden',
+      }}>
+        {/* Scrolling strip — duplicated twice for seamless loop */}
+        <div style={{
+          display:    'flex',
+          alignItems: 'center',
+          animation:  'ticker-scroll 24s linear infinite',
+          whiteSpace: 'nowrap',
+          willChange: 'transform',
+        }}>
+          {[0, 1].map(rep => (
+            <span key={rep} style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <span style={{
+                fontFamily:    'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                fontSize:      11,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color:         'rgba(232,224,208,0.5)',
+                padding:       '0 28px',
+                flexShrink:    0,
+              }}>
+                Works with:
+              </span>
+              {TICKER_ITEMS.map((item, i) => (
+                <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <span style={{
+                    fontFamily:    'var(--font-ibm-mono), IBM Plex Mono, monospace',
+                    fontSize:      12,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color:         '#E8E0D0',
+                    padding:       '0 20px',
+                    flexShrink:    0,
+                  }}>{item}</span>
+                  {i < TICKER_ITEMS.length - 1 && (
+                    <span style={{ color: '#7C6A9E', fontSize: 16, flexShrink: 0 }}>·</span>
                   )}
-                  {cat.label}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Card grid */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-sm font-semibold text-[#EDE8DF]">
-                {activeCategory === 'all' ? 'All items' : SIDEBAR_CATEGORIES.find(c => c.id === activeCategory)?.label}
-                <span className="ml-2 text-[rgba(237,232,223,0.4)] font-normal text-xs">
-                  {filtered.length} results
                 </span>
-              </h2>
-              <button className="btn-ghost text-xs text-[rgba(237,232,223,0.45)] hover:text-[#EDE8DF] px-2 py-1 rounded">
-                Sort: Most Deployed ↓
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filtered.map(agent => (
-                <AgentCard key={agent.id} agent={agent} />
               ))}
-            </div>
-            {filtered.length === 0 && (
-              <div className="flex items-center justify-center h-40 text-[rgba(237,232,223,0.35)] text-sm">
-                No items in this category yet.
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TEAM BUILDER FEATURE ─────────────────────────────────────────── */}
-      <section
-        className="relative overflow-hidden border-t border-[#2A2520]"
-        style={{ background: 'linear-gradient(135deg, #1C1916 0%, #1A1230 100%)' }}
-      >
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 50% 60% at 20% 50%, rgba(124,107,158,0.1) 0%, transparent 65%)' }}
-        />
-        <div className="relative max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-12">
-          <div className="flex-1 text-center lg:text-left">
-            <span className="inline-block text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full border mb-5" style={{ background: 'rgba(124,107,158,0.12)', borderColor: 'rgba(124,107,158,0.3)', color: '#A594C4' }}>
-              Team Builder
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#EDE8DF] mb-4 leading-tight">
-              Assemble your
-              <br />
-              <span style={{ color: '#A594C4' }}>dream agent team.</span>
-            </h2>
-            <p className="text-[rgba(237,232,223,0.55)] leading-relaxed max-w-md mx-auto lg:mx-0 mb-6">
-              Mix and match agents into a coordinated team with defined roles. One export, ready for any orchestration platform.
-            </p>
-            <Link
-              href="/team-builder"
-              className="btn-primary inline-flex px-5 py-2.5 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium"
-            >
-              Try Team Builder
-            </Link>
-          </div>
-          <div className="shrink-0 flex flex-col gap-3">
-            <div className="flex gap-3">
-              {TEAM_MEMBERS.slice(0, 3).map(m => (
-                <div key={m.label} className="flex flex-col items-center gap-1.5">
-                  <PixelAvatar category={m.category} size={52} className="ring-2 ring-[#2A2520]" />
-                  <span className="text-[10px] text-[rgba(237,232,223,0.45)]">{m.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3 ml-6">
-              {TEAM_MEMBERS.slice(3).map(m => (
-                <div key={m.label} className="flex flex-col items-center gap-1.5">
-                  <PixelAvatar category={m.category} size={52} className="ring-2 ring-[#2A2520]" />
-                  <span className="text-[10px] text-[rgba(237,232,223,0.45)]">{m.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="text-center mt-1">
-              <span className="text-xs text-[rgba(237,232,223,0.35)]">6-agent startup team · 1 export</span>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
 
-      {/* ── PROMPT CUSTOMISER FEATURE ─────────────────────────────────────── */}
-      <section
-        className="relative overflow-hidden border-t border-[#2A2520]"
-        style={{ background: '#0E0E16' }}
-      >
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 50% 60% at 80% 50%, rgba(212,82,30,0.07) 0%, transparent 65%)' }}
-        />
-        <div className="relative max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row-reverse items-center gap-12">
-          <div className="flex-1 text-center lg:text-left">
-            <span className="inline-block text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full border mb-5" style={{ background: 'rgba(212,82,30,0.08)', borderColor: 'rgba(212,82,30,0.25)', color: '#D4521E' }}>
-              Prompt Customiser · Powered by Claude
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#EDE8DF] mb-4 leading-tight">
-              Make every agent
-              <br />
-              <span style={{ color: '#C4785A' }}>yours.</span>
-            </h2>
-            <p className="text-[rgba(237,232,223,0.55)] leading-relaxed max-w-md mx-auto lg:mx-0 mb-6">
-              Describe your use case in plain English. Claude rewrites the agent's instructions to fit your workflow perfectly — no prompt engineering required.
-            </p>
-            <Link
-              href="/browse"
-              className="btn-ghost inline-flex px-5 py-2.5 rounded-full border border-[#332E28] text-[rgba(237,232,223,0.7)] text-sm font-medium hover:border-[rgba(124,106,158,0.4)] hover:text-[#EDE8DF]"
-            >
-              Browse &amp; Customise
-            </Link>
-          </div>
-
-          {/* Mock editor */}
-          <div className="shrink-0 w-full max-w-sm">
-            <div className="rounded-[14px] bg-[#1C1916] border border-[#2A2520] overflow-hidden">
-              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[#2A2520]">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#332E28]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#332E28]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#332E28]" />
-                <span className="ml-2 text-xs text-[rgba(237,232,223,0.35)]">Prompt Customiser</span>
-              </div>
-              <div className="p-4 space-y-3">
-                <div>
-                  <p className="text-[10px] text-[rgba(237,232,223,0.4)] uppercase tracking-wider mb-1.5">Your use case</p>
-                  <div className="rounded-lg bg-[#242018] border border-[#332E28] px-3 py-2 text-sm text-[rgba(237,232,223,0.7)]">
-                    I run a SaaS for B2B clients and need cold emails that mention their specific product category…
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-px bg-[#2A2520]" />
-                  <span className="text-[10px] text-[rgba(237,232,223,0.3)]">Claude rewrites ↓</span>
-                  <div className="flex-1 h-px bg-[#2A2520]" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-[rgba(237,232,223,0.4)] uppercase tracking-wider mb-1.5">Customised agent</p>
-                  <div className="rounded-lg bg-[#1A1520] border border-[rgba(124,107,158,0.25)] px-3 py-2 text-xs text-[rgba(237,232,223,0.65)] leading-relaxed line-clamp-3">
-                    You are a B2B cold email specialist for SaaS companies. When given a prospect's company name and product category, write a 3-sentence email…
-                  </div>
-                </div>
-                <button className="btn-primary w-full py-2 rounded-full bg-[#7C6B9E] text-[#EDE8DF] text-sm font-medium">
-                  Apply &amp; Deploy
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER CTA ───────────────────────────────────────────────────── */}
-      <section className="border-t border-[#2A2520] py-20 text-center">
-        <h2 className="text-3xl font-bold text-[#EDE8DF] mb-3">Ready to deploy?</h2>
-        <p className="text-[rgba(237,232,223,0.55)] mb-7 max-w-sm mx-auto">
-          Join thousands of builders sharing and deploying intelligence.
-        </p>
-        <Link
-          href="/signup"
-          className="btn-primary inline-flex px-7 py-3 rounded-full bg-[#7C6B9E] text-[#EDE8DF] font-semibold text-sm"
-        >
-          Get started free
-        </Link>
-      </section>
-
-      {/* Search modal */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   )

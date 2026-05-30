@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 
@@ -53,6 +54,10 @@ const PIXEL_CHARS = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Homepage has its own full layout — bypass AppShell entirely
+  if (pathname === '/') return <>{children}</>
 
   return (
     <>

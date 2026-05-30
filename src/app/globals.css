@@ -323,6 +323,24 @@ a:hover, button:hover, [role="button"]:hover {
   transform: translateX(4px);
 }
 
+/* ── Homepage tree animations ──────────────────────────────────────── */
+@keyframes leaf-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(0deg); }
+  35%       { transform: rotate(0.6deg); }
+  70%       { transform: rotate(-0.4deg); }
+}
+
+/* ── Homepage ticker scroll ────────────────────────────────────────── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
