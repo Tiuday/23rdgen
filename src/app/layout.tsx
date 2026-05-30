@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter, DM_Serif_Display, IBM_Plex_Mono } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import AppShell from '@/components/layout/AppShell'
-import CustomCursor from '@/components/layout/CustomCursor'
 import './globals.css'
 import '../styles/tokens.css'
 // Akt is loaded via <link> in the layout head (not available in next/font/google)
@@ -54,6 +53,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -63,7 +63,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#EDE8DF] antialiased font-sans">
         <Providers>
-          <CustomCursor />
           <AppShell>
             {children}
           </AppShell>

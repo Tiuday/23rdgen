@@ -116,15 +116,6 @@
   --chart-5: #3A4560;
 }
 
-/* ── Pixel art cursor ──────────────────────────────────────────────── */
-body,
-a, button, input, select, textarea, [role="button"] {
-  cursor: url('/cursors/pixel-arrow.svg') 0 0, auto;
-}
-a:hover, button:hover, [role="button"]:hover {
-  cursor: url('/cursors/pixel-pointer.svg') 2 0, pointer;
-}
-
 /* ── Global button spring animation system ─────────────────────────── */
 .btn-primary {
   display: inline-flex;
@@ -174,7 +165,6 @@ a:hover, button:hover, [role="button"]:hover {
   font-size: 14px;
   padding: 10px 24px;
   transition: box-shadow 80ms ease, transform 80ms ease;
-  cursor: url('/cursors/pixel-pointer.svg') 2 0, pointer;
 }
 .btn-retro-primary:hover {
   box-shadow: 2px 2px 0px #E8E0D0;
@@ -199,7 +189,6 @@ a:hover, button:hover, [role="button"]:hover {
   font-size: 14px;
   padding: 10px 24px;
   transition: box-shadow 80ms ease, transform 80ms ease;
-  cursor: url('/cursors/pixel-pointer.svg') 2 0, pointer;
 }
 .btn-retro-ghost:hover {
   box-shadow: 2px 2px 0px rgba(232, 224, 208, 0.3);
@@ -341,6 +330,16 @@ a:hover, button:hover, [role="button"]:hover {
   100% { transform: translateX(-50%); }
 }
 
+/* ── Homepage root undulation ──────────────────────────────────────── */
+@keyframes root-undulate {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(3px); }
+}
+@keyframes root-undulate-up {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3px); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -349,10 +348,12 @@ a:hover, button:hover, [role="button"]:hover {
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    cursor: auto;
   }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    cursor: auto;
   }
   h1, h2, h3 {
     font-family: var(--font-heading);
