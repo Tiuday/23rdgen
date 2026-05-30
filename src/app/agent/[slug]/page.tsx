@@ -20,12 +20,43 @@ interface AgentDetail {
 }
 
 const CATEGORY_BADGE: Record<string, { bg: string; text: string; border: string }> = {
-  agent:    { bg: 'rgba(212,82,30,0.12)',   text: '#D4521E', border: 'rgba(212,82,30,0.25)' },
-  prompt:   { bg: 'rgba(124,107,158,0.15)', text: '#A594C4', border: 'rgba(124,107,158,0.3)' },
-  skill:    { bg: 'rgba(107,143,113,0.15)', text: '#6B8F71', border: 'rgba(107,143,113,0.3)' },
-  workflow: { bg: 'rgba(196,120,90,0.12)',  text: '#C4785A', border: 'rgba(196,120,90,0.25)' },
-  team:     { bg: 'rgba(176,96,112,0.12)',  text: '#B06070', border: 'rgba(176,96,112,0.25)' },
-  browser:  { bg: 'rgba(90,106,122,0.12)',  text: '#5A6A7A', border: 'rgba(90,106,122,0.25)' },
+  agent:    { bg: '#FFDDD0', text: '#7A2A10', border: '#C4622D' },
+  prompt:   { bg: '#EAE0F5', text: '#4A2A7A', border: '#7C6A9E' },
+  skill:    { bg: '#D0EDD5', text: '#1E4D28', border: '#6B8F71' },
+  workflow: { bg: '#F5E6D0', text: '#6B3A1E', border: '#A0785A' },
+  team:     { bg: '#F5D8DC', text: '#6B1E28', border: '#A05060' },
+  browser:  { bg: '#D8E0EC', text: '#1E2E50', border: '#5A6A7A' },
+}
+
+function PixelActionBtn({
+  onClick, label, bg, color, border, shadow,
+}: {
+  onClick: () => void; label: string; bg: string; color: string; border: string; shadow: string
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        fontFamily: 'var(--font-ibm-mono), monospace',
+        fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+        background: bg, color, border, boxShadow: shadow,
+        borderRadius: 0, padding: '9px 0', width: '100%',
+        cursor: 'pointer', transition: 'transform 60ms ease, box-shadow 60ms ease',
+      }}
+      onMouseEnter={e => {
+        const el = e.currentTarget as HTMLButtonElement
+        el.style.transform = 'translate(2px,2px)'
+        el.style.boxShadow = shadow.replace(/\d+px \d+px/, '1px 1px')
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget as HTMLButtonElement
+        el.style.transform = ''
+        el.style.boxShadow = shadow
+      }}
+    >
+      {label}
+    </button>
+  )
 }
 
 export default function AgentSlugPage() {
@@ -43,11 +74,10 @@ export default function AgentSlugPage() {
         const { data, error } = await supabase
           .from('agents')
           .select('id, name, category, description, long_description, content, creator_name, deploy_count, rating, tags')
-          .eq('slug', slug)
-          .single()
+          .eq('slug', slug).single()
         if (!error && data) setAgent(data as AgentDetail)
       } catch {
-        // no-op — show not found
+        // show not found
       } finally {
         setLoading(false)
       }
@@ -64,17 +94,19 @@ export default function AgentSlugPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="text-sm text-[rgba(232,224,208,0.35)] animate-pulse">Loading…</span>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, color: '#8A7A6A' }}>Loading…</span>
       </div>
     )
   }
 
   if (!agent) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-[rgba(232,224,208,0.55)]">Agent not found.</p>
-        <Link href="/browse" className="text-[#A594C4] text-sm hover:underline">← Back to Browse</Link>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <p style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 14, color: '#6A5A4A' }}>Agent not found.</p>
+        <Link href="/browse" style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, color: '#7C6A9E', fontWeight: 600, textDecoration: 'none' }}>
+          ← Back to Browse
+        </Link>
       </div>
     )
   }
@@ -83,47 +115,64 @@ export default function AgentSlugPage() {
   const badge = CATEGORY_BADGE[agent.category] ?? CATEGORY_BADGE.agent
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <Link href="/browse" className="inline-flex items-center gap-1.5 text-xs mb-8 transition-colors" style={{ color: 'rgba(232,224,208,0.4)' }}>
+    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <Link
+        href="/browse"
+        style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, color: '#8A7A6A', textDecoration: 'none', display: 'inline-block', marginBottom: 28 }}
+      >
         ← Back to Browse
       </Link>
 
-      <div className="flex items-start gap-5 mb-6">
-        <PixelAvatar category={cat} size={64} />
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', marginBottom: 24 }}>
+        <div style={{ width: 64, height: 64, background: '#F0E6D0', border: '2px solid #0A0A0F', boxShadow: '3px 3px 0px #0A0A0F', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <PixelAvatar category={cat} size={44} />
+        </div>
         <div>
-          <span className="inline-block text-xs px-2.5 py-1 rounded-full border font-medium capitalize mb-2"
-            style={{ background: badge.bg, color: badge.text, borderColor: badge.border }}>
+          <span style={{ display: 'inline-block', fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '3px 10px', background: badge.bg, color: badge.text, border: `1px solid ${badge.border}`, marginBottom: 8 }}>
             {agent.category}
           </span>
-          <h1 className="text-3xl font-bold text-[#E8E0D0]">{agent.name}</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(232,224,208,0.4)' }}>
+          <h1 style={{ fontFamily: 'var(--font-dm-serif), "DM Serif Display", serif', fontSize: '2rem', color: '#0A0A0F', margin: '0 0 6px', lineHeight: 1.15 }}>
+            {agent.name}
+          </h1>
+          <p style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, color: '#8A7A6A', margin: 0 }}>
             by {agent.creator_name ?? 'anonymous'} · {agent.deploy_count.toLocaleString()} deploys
           </p>
         </div>
       </div>
 
-      <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(232,224,208,0.7)' }}>
+      <p style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 14, color: '#2A1A0E', lineHeight: 1.7, marginBottom: 24 }}>
         {agent.long_description ?? agent.description}
       </p>
 
+      {/* Prompt */}
+      <div
+        style={{
+          background: '#E8DCC8', border: '2px solid rgba(0,0,0,0.15)',
+          padding: '16px 18px', fontFamily: 'var(--font-ibm-mono), monospace',
+          fontSize: 12, color: '#2A1A0E', lineHeight: 1.75, whiteSpace: 'pre-wrap',
+          maxHeight: 300, overflowY: 'auto', marginBottom: 24,
+        }}
+        className="scrollbar-none"
+      >
+        {agent.content}
+      </div>
+
       {agent.tags && agent.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
           {agent.tags.map(tag => (
-            <span key={tag} className="text-xs px-2.5 py-1 rounded-full"
-              style={{ background: 'rgba(160,120,90,0.1)', color: '#A0785A', border: '1px solid rgba(160,120,90,0.2)' }}>
+            <span key={tag} style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 11, padding: '3px 10px', background: '#E8DCC8', color: '#6A5A4A', border: '1px solid rgba(0,0,0,0.2)' }}>
               {tag}
             </span>
           ))}
         </div>
       )}
 
-      <button
-        onClick={handleCopy}
-        className="px-6 py-2.5 rounded-full text-sm font-medium transition-all"
-        style={{ background: copied ? '#6B8F71' : '#7C6A9E', color: '#E8E0D0' }}
-      >
-        {copied ? 'Copied ✓' : 'Copy to Clipboard'}
-      </button>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <PixelActionBtn onClick={handleCopy} label={copied ? '✓ Copied!' : 'Copy to Clipboard'} bg={copied ? '#6B8F71' : '#0A0A0F'} color="#E8E0D0" border={`2px solid ${copied ? '#6B8F71' : '#0A0A0F'}`} shadow="3px 3px 0px rgba(10,10,15,0.3)" />
+        <PixelActionBtn onClick={() => window.open(`https://claude.ai/new?q=${encodeURIComponent(agent.content)}`, '_blank')} label="Open in Claude" bg="#7C6A9E" color="#E8E0D0" border="2px solid #0A0A0F" shadow="3px 3px 0px rgba(10,10,15,0.3)" />
+        <PixelActionBtn onClick={() => window.open(`https://chat.openai.com/?q=${encodeURIComponent(agent.content)}`, '_blank')} label="Open in ChatGPT" bg="#2A6A3A" color="#E8E0D0" border="2px solid #0A0A0F" shadow="3px 3px 0px rgba(10,10,15,0.3)" />
+        <PixelActionBtn onClick={() => window.open(`https://gemini.google.com/app?q=${encodeURIComponent(agent.content)}`, '_blank')} label="Open in Gemini" bg="#C4622D" color="#E8E0D0" border="2px solid #0A0A0F" shadow="3px 3px 0px rgba(10,10,15,0.3)" />
+      </div>
     </div>
   )
 }

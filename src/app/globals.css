@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -6,7 +6,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* shadcn semantic token bridge */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -40,204 +39,194 @@
   --color-chart-5: var(--chart-5);
 
   /* 23rdGen brand palette */
-  --color-obsidian: #141210;
-  --color-surface: #1C1916;
-  --color-elevated: #242018;
-  --color-parchment: #EDE8DF;
-  --color-parchment-muted: rgba(237, 232, 223, 0.55);
-  --color-parchment-subtle: rgba(237, 232, 223, 0.25);
-  --color-violet: #7C6B9E;
-  --color-violet-soft: #A594C4;
-  --color-violet-tint: rgba(124, 107, 158, 0.15);
-  --color-ember: #D4521E;
-  --color-ember-tint: rgba(212, 82, 30, 0.12);
-  --color-sage: #3A6B45;
-  --color-sage-tint: rgba(58, 107, 69, 0.15);
-  --color-clay: #C4785A;
-  --color-clay-tint: rgba(196, 120, 90, 0.12);
-  --color-rose: #8C3A56;
-  --color-rose-tint: rgba(140, 58, 86, 0.12);
-  --color-slate: #3A4560;
-  --color-slate-tint: rgba(58, 69, 96, 0.15);
+  --color-obsidian: #0A0A0F;
+  --color-parchment: #E8E0D0;
+  --color-ivory: #F0E6D0;
+  --color-maroon: #2A0A0A;
+  --color-mahogany: #2A1A0E;
+  --color-violet: #7C6A9E;
+  --color-ember: #C4622D;
+  --color-sage: #6B8F71;
+  --color-clay: #A0785A;
+  --color-slate: #5A6A7A;
+  --color-gold: #B8960C;
+  --color-aged: #D4C9A8;
 
-  /* Brand radius tokens */
-  --radius-pill: 100px;
-  --radius-card: 14px;
-  --radius-input: 10px;
-  --radius-modal: 16px;
-
-  /* shadcn radius scale */
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Radius — neobrutalist zero */
+  --radius-pill: 0px;
+  --radius-card: 0px;
+  --radius-input: 0px;
+  --radius-modal: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 
   /* Typography */
-  --font-sans: var(--font-inter), 'Inter', sans-serif;
-  --font-mono: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
-  --font-heading: var(--font-dm-serif), 'DM Serif Display', serif;
+  --font-sans: var(--font-ibm-mono), 'IBM Plex Mono', 'Courier New', monospace;
+  --font-mono: var(--font-ibm-mono), 'IBM Plex Mono', 'Courier New', monospace;
+  --font-heading: var(--font-dm-serif), 'DM Serif Display', Georgia, serif;
 }
 
-/* 23rdGen — always dark */
+/* 23rdGen — parchment light theme */
 :root {
-  --background: #0A0A0F;
-  --foreground: #EDE8DF;
-  --card: #1C1916;
-  --card-foreground: #EDE8DF;
-  --popover: #1C1916;
-  --popover-foreground: #EDE8DF;
-  --primary: #7C6B9E;
-  --primary-foreground: #EDE8DF;
-  --secondary: #242018;
-  --secondary-foreground: #EDE8DF;
-  --muted: #242018;
-  --muted-foreground: rgba(237, 232, 223, 0.55);
-  --accent: #242018;
-  --accent-foreground: #EDE8DF;
-  --destructive: #D4521E;
-  --border: #2A2520;
-  --input: #2A2520;
-  --ring: #7C6B9E;
-  --radius: 0.875rem;
-  --sidebar: #1C1916;
-  --sidebar-foreground: #EDE8DF;
-  --sidebar-primary: #7C6B9E;
-  --sidebar-primary-foreground: #EDE8DF;
-  --sidebar-accent: #242018;
-  --sidebar-accent-foreground: #EDE8DF;
-  --sidebar-border: #2A2520;
-  --sidebar-ring: #7C6B9E;
-  --chart-1: #7C6B9E;
-  --chart-2: #D4521E;
-  --chart-3: #3A6B45;
-  --chart-4: #C4785A;
-  --chart-5: #3A4560;
+  --background: #E8E0D0;
+  --foreground: #0A0A0F;
+  --card: #F0E6D0;
+  --card-foreground: #0A0A0F;
+  --popover: #F0E6D0;
+  --popover-foreground: #0A0A0F;
+  --primary: #7C6A9E;
+  --primary-foreground: #E8E0D0;
+  --secondary: #D4C9A8;
+  --secondary-foreground: #0A0A0F;
+  --muted: #D4C9A8;
+  --muted-foreground: #8A7A6A;
+  --accent: #D4C9A8;
+  --accent-foreground: #0A0A0F;
+  --destructive: #C4622D;
+  --border: rgba(0, 0, 0, 0.15);
+  --input: rgba(0, 0, 0, 0.1);
+  --ring: #7C6A9E;
+  --radius: 0rem;
+  --sidebar: #E8E0D0;
+  --sidebar-foreground: #0A0A0F;
+  --sidebar-primary: #7C6A9E;
+  --sidebar-primary-foreground: #E8E0D0;
+  --sidebar-accent: rgba(124, 106, 158, 0.1);
+  --sidebar-accent-foreground: #0A0A0F;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: #7C6A9E;
+  --chart-1: #7C6A9E;
+  --chart-2: #C4622D;
+  --chart-3: #6B8F71;
+  --chart-4: #A0785A;
+  --chart-5: #5A6A7A;
 }
 
-/* ── Global button spring animation system ─────────────────────────── */
+/* ── Pixel button system ──────────────────────────────────────────── */
+.btn-pixel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0A0A0F;
+  color: #E8E0D0;
+  border: 2px solid #0A0A0F;
+  box-shadow: 3px 3px 0px #0A0A0F;
+  border-radius: 0;
+  font-family: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: transform 60ms ease, box-shadow 60ms ease;
+}
+.btn-pixel:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #0A0A0F;
+}
+.btn-pixel:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.btn-pixel-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #0A0A0F;
+  border: 2px solid #0A0A0F;
+  box-shadow: 3px 3px 0px rgba(10, 10, 15, 0.3);
+  border-radius: 0;
+  font-family: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: transform 60ms ease, box-shadow 60ms ease;
+}
+.btn-pixel-ghost:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px rgba(10, 10, 15, 0.3);
+}
+
+/* Legacy compat */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.btn-primary:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 20px rgba(124, 106, 158, 0.5);
-}
-.btn-primary:active {
-  transform: scale(0.94);
-  transition-duration: 80ms;
-}
+.btn-primary:hover { transform: scale(1.04); }
+.btn-primary:active { transform: scale(0.96); }
 
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
-              background 150ms ease,
-              color 150ms ease;
+  transition: transform 150ms ease, background 150ms ease;
 }
-.btn-ghost:hover {
-  transform: scale(1.06);
-  background: rgba(124, 107, 158, 0.08);
-}
-.btn-ghost:active {
-  transform: scale(0.94);
-  transition-duration: 80ms;
-}
+.btn-ghost:hover { background: rgba(0, 0, 0, 0.06); }
 
-/* ── Retro hard-shadow button system ───────────────────────────────── */
+/* Retro variants used in plans/homepage */
 .btn-retro-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #7C6A9E;
+  background: #0A0A0F;
   color: #E8E0D0;
-  border: 2px solid #E8E0D0;
-  box-shadow: 4px 4px 0px #E8E0D0;
+  border: 2px solid #0A0A0F;
+  box-shadow: 4px 4px 0px rgba(10, 10, 15, 0.4);
   border-radius: 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 24px;
-  transition: box-shadow 80ms ease, transform 80ms ease;
+  transition: box-shadow 60ms ease, transform 60ms ease;
 }
 .btn-retro-primary:hover {
-  box-shadow: 2px 2px 0px #E8E0D0;
+  box-shadow: 2px 2px 0px rgba(10, 10, 15, 0.4);
   transform: translate(2px, 2px);
 }
-.btn-retro-primary:active {
-  box-shadow: 0px 0px 0px #E8E0D0;
-  transform: translate(4px, 4px);
-}
 
-.btn-retro-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: #E8E0D0;
-  border: 2px solid #E8E0D0;
-  box-shadow: 4px 4px 0px rgba(232, 224, 208, 0.3);
-  border-radius: 0;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  padding: 10px 24px;
-  transition: box-shadow 80ms ease, transform 80ms ease;
-}
-.btn-retro-ghost:hover {
-  box-shadow: 2px 2px 0px rgba(232, 224, 208, 0.3);
-  transform: translate(2px, 2px);
-}
-.btn-retro-ghost:active {
-  box-shadow: 0px 0px;
-  transform: translate(4px, 4px);
-}
-
-/* ── Retro card ────────────────────────────────────────────────────── */
+/* ── Retro card ───────────────────────────────────────────────────── */
 .card-retro {
-  border: 2px solid rgba(232, 224, 208, 0.15);
-  box-shadow: 4px 4px 0px rgba(124, 106, 158, 0.2);
+  border: 2px solid #0A0A0F;
+  box-shadow: 4px 4px 0px #0A0A0F;
   border-radius: 0;
-  transition: box-shadow 80ms ease, transform 80ms ease, border-color 80ms ease;
+  background: #F0E6D0;
+  transition: box-shadow 60ms ease, transform 60ms ease;
 }
 .card-retro:hover {
-  box-shadow: 2px 2px 0px rgba(124, 106, 158, 0.35);
   transform: translate(2px, 2px);
-  border-color: rgba(232, 224, 208, 0.3);
+  box-shadow: 2px 2px 0px #0A0A0F;
 }
 
-/* ── Text shimmer keyframe ─────────────────────────────────────────── */
+/* ── Keyframe animations ──────────────────────────────────────────── */
 @keyframes text-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
 }
-
-/* ── Pulse ring keyframe (Browse Agents button) ────────────────────── */
 @keyframes pulse-ring {
   0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.5; }
   100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
 }
-
-/* ── Blinking pixel cursor ─────────────────────────────────────────── */
 @keyframes blink-cursor {
   0%, 49% { opacity: 0.8; }
   50%, 100% { opacity: 0; }
 }
-
-/* ── Retro widget float ────────────────────────────────────────────── */
 @keyframes widget-float {
   0%, 100% { transform: rotate(1.5deg) translateY(0px); }
   50%       { transform: rotate(1.5deg) translateY(-6px); }
 }
-
-/* ── Power-on entrance ─────────────────────────────────────────────── */
 @keyframes power-on {
   0%   { transform: scale(0.95); opacity: 0; }
   100% { transform: scale(1);    opacity: 1; }
@@ -250,8 +239,6 @@
   0%   { transform: rotate(1.5deg) scale(0.95); opacity: 0; }
   100% { transform: rotate(1.5deg) scale(1);    opacity: 1; }
 }
-
-/* ── Floating character drift animations ───────────────────────────── */
 @keyframes drift-1 {
   0%   { transform: translate(0px,   0px); }
   20%  { transform: translate(35px,  15px); }
@@ -286,8 +273,41 @@
   75%  { transform: translate(20px,  -30px); }
   100% { transform: translate(0px,   0px); }
 }
+@keyframes leaf-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(0deg); }
+  35%       { transform: rotate(0.6deg); }
+  70%       { transform: rotate(-0.4deg); }
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes root-undulate {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(3px); }
+}
+@keyframes root-undulate-up {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3px); }
+}
+@keyframes rootPulse {
+  0%, 100% { transform: translateY(0px) scaleX(1); }
+  50%       { transform: translateY(4px) scaleX(1.003); }
+}
+@keyframes footer-drift {
+  0%, 100% { letter-spacing: -0.02em; }
+  50%       { letter-spacing: 0.01em; }
+}
+@keyframes footer-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-/* ── Scroll animation system ───────────────────────────────────────── */
+/* ── Scroll animation system ──────────────────────────────────────── */
 .scroll-fade-up {
   opacity: 0;
   transform: translateY(20px);
@@ -297,7 +317,6 @@
   opacity: 1;
   transform: translateY(0);
 }
-
 .scroll-slide-left {
   opacity: 0;
   transform: translateX(-20px);
@@ -308,58 +327,13 @@
   transform: translateX(0);
 }
 
-/* ── Sidebar nav hover slide ───────────────────────────────────────── */
-.sidebar-nav-link:hover {
-  transform: translateX(4px);
+/* ── Sidebar nav hover ────────────────────────────────────────────── */
+.sidebar-nav-link {
+  transition: transform 150ms ease, background 150ms ease;
 }
+.sidebar-nav-link:hover { transform: translateX(3px); }
 
-/* ── Homepage tree animations ──────────────────────────────────────── */
-@keyframes leaf-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-4px); }
-}
-
-@keyframes tree-sway {
-  0%, 100% { transform: rotate(0deg); }
-  35%       { transform: rotate(0.6deg); }
-  70%       { transform: rotate(-0.4deg); }
-}
-
-/* ── Homepage ticker scroll ────────────────────────────────────────── */
-@keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* ── Homepage root undulation ──────────────────────────────────────── */
-@keyframes root-undulate {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(3px); }
-}
-@keyframes root-undulate-up {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-3px); }
-}
-
-/* ── TreeRoots pulse ────────────────────────────────────────────────── */
-@keyframes rootPulse {
-  0%,100% { transform: translateY(0px) scaleX(1); }
-  50% { transform: translateY(4px) scaleX(1.003); }
-}
-
-/* ── Footer wordmark drift ─────────────────────────────────────────── */
-@keyframes footer-drift {
-  0%, 100% { letter-spacing: -0.02em; }
-  50% { letter-spacing: 0.01em; }
-}
-
-/* ── Footer bottom bar fade in ─────────────────────────────────────── */
-@keyframes footer-fadein {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Footer column entrance ────────────────────────────────────────── */
+/* ── Footer ───────────────────────────────────────────────────────── */
 .footer-col {
   opacity: 0;
   transform: translateY(20px);
@@ -370,56 +344,51 @@
   transform: translateY(0);
 }
 
-/* ── Hide scrollbar utility ────────────────────────────────────────── */
+/* ── Scrollbar ────────────────────────────────────────────────────── */
 .scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-none::-webkit-scrollbar { display: none; }
 
 @layer base {
-  * {
+  *, *::before, *::after {
+    box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
-  body {
+  html, body {
+    font-family: var(--font-ibm-mono), 'IBM Plex Mono', 'Courier New', monospace !important;
     background-color: #E8E0D0;
     background-image: radial-gradient(circle, #A89880 1px, transparent 1px);
     background-size: 24px 24px;
     background-attachment: fixed;
-    color: #EDE8DF;
+    color: #0A0A0F;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    cursor: auto;
+    cursor: auto !important;
   }
-  html {
-    @apply font-sans;
-    scroll-behavior: smooth;
-    cursor: auto;
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: var(--font-dm-serif), 'DM Serif Display', Georgia, serif !important;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading) !important;
-  }
-  body, p, span, a, button, input, label, div {
-    font-family: var(--font-mono) !important;
+  button, input, textarea, select, a, p, span, div, label {
+    font-family: var(--font-ibm-mono), 'IBM Plex Mono', 'Courier New', monospace !important;
   }
   ::selection {
-    background: rgba(124, 107, 158, 0.35);
-    color: #EDE8DF;
+    background: rgba(124, 106, 158, 0.3);
+    color: #0A0A0F;
   }
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #141210;
+    background: #D4C9A8;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2A2520;
-    border-radius: 100px;
+    background: #A89880;
+    border-radius: 0;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #332E28;
+    background: #8A7A6A;
   }
 }

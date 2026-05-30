@@ -1,27 +1,22 @@
 import type { Metadata } from 'next'
-import { Inter, DM_Serif_Display, IBM_Plex_Mono } from 'next/font/google'
+import { DM_Serif_Display, IBM_Plex_Mono } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import AppShell from '@/components/layout/AppShell'
 import './globals.css'
 import '../styles/tokens.css'
-// Akt is loaded via <link> in the layout head (not available in next/font/google)
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-})
 
 const dmSerifDisplay = DM_Serif_Display({
   variable: '--font-dm-serif',
   weight: '400',
+  style: ['normal', 'italic'],
   subsets: ['latin'],
   display: 'swap',
 })
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: '--font-ibm-mono',
-  weight: ['400', '500', '600'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
   subsets: ['latin'],
   display: 'swap',
 })
@@ -49,19 +44,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${dmSerifDisplay.variable} ${ibmPlexMono.variable} h-full`}
+      className={`${dmSerifDisplay.variable} ${ibmPlexMono.variable} h-full`}
       suppressHydrationWarning
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Akt:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className="min-h-full flex flex-col antialiased font-sans">
+      <body className="min-h-full flex flex-col antialiased">
         <Providers>
           <AppShell>
             {children}

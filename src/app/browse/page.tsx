@@ -1,11 +1,12 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PixelAvatar from '@/components/mascot/PixelAvatar'
 import type { AgentCategory } from '@/types/agent'
 
-type TabCategory = AgentCategory | 'all'
+type TypeFilter = 'all' | 'agent' | 'prompt' | 'skill' | 'workflow' | 'team'
 type SortOption = 'trending' | 'newest' | 'top_rated'
 
 interface BrowseAgent {
@@ -21,122 +22,107 @@ interface BrowseAgent {
 }
 
 const CATEGORY_BADGE: Record<string, { bg: string; text: string; border: string }> = {
-  agent:    { bg: 'rgba(212,82,30,0.12)',   text: '#D4521E', border: 'rgba(212,82,30,0.25)' },
-  prompt:   { bg: 'rgba(124,107,158,0.15)', text: '#A594C4', border: 'rgba(124,107,158,0.3)' },
-  skill:    { bg: 'rgba(107,143,113,0.15)', text: '#6B8F71', border: 'rgba(107,143,113,0.3)' },
-  workflow: { bg: 'rgba(196,120,90,0.12)',  text: '#C4785A', border: 'rgba(196,120,90,0.25)' },
-  team:     { bg: 'rgba(176,96,112,0.12)',  text: '#B06070', border: 'rgba(176,96,112,0.25)' },
-  browser:  { bg: 'rgba(90,106,122,0.12)',  text: '#5A6A7A', border: 'rgba(90,106,122,0.25)' },
+  agent:    { bg: '#FFDDD0', text: '#7A2A10', border: '#C4622D' },
+  prompt:   { bg: '#EAE0F5', text: '#4A2A7A', border: '#7C6A9E' },
+  skill:    { bg: '#D0EDD5', text: '#1E4D28', border: '#6B8F71' },
+  workflow: { bg: '#F5E6D0', text: '#6B3A1E', border: '#A0785A' },
+  team:     { bg: '#F5D8DC', text: '#6B1E28', border: '#A05060' },
+  browser:  { bg: '#D8E0EC', text: '#1E2E50', border: '#5A6A7A' },
 }
 
 const MOCK_AGENTS: BrowseAgent[] = [
-  {
-    id: '1',
-    name: 'Code Review Wizard',
-    category: 'agent',
-    description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.',
-    creator_name: 'devtools_hq',
-    deploy_count: 2840,
-    rating: 4.8,
-    created_at: '2026-01-15T00:00:00Z',
-    tags: ['code', 'review', 'security'],
-  },
-  {
-    id: '2',
-    name: 'SEO Scribe',
-    category: 'prompt',
-    description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a simple keyword list.',
-    creator_name: 'marketers',
-    deploy_count: 1650,
-    rating: 4.5,
-    created_at: '2026-02-10T00:00:00Z',
-    tags: ['seo', 'content', 'writing'],
-  },
-  {
-    id: '3',
-    name: 'SQL Craftsperson',
-    category: 'skill',
-    description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite with clear explanations.',
-    creator_name: 'dataeng',
-    deploy_count: 3200,
-    rating: 4.9,
-    created_at: '2026-01-20T00:00:00Z',
-    tags: ['sql', 'database', 'data'],
-  },
-  {
-    id: '4',
-    name: 'Research Conductor',
-    category: 'workflow',
-    description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',
-    creator_name: 'researchers',
-    deploy_count: 890,
-    rating: 4.3,
-    created_at: '2026-03-01T00:00:00Z',
-    tags: ['research', 'workflow', 'reports'],
-  },
-  {
-    id: '5',
-    name: 'Bug Hunter Pro',
-    category: 'agent',
-    description: 'Scans code for common bug patterns, off-by-one errors, null pointer risks, and silent runtime exceptions.',
-    creator_name: 'debuggers',
-    deploy_count: 1420,
-    rating: 4.6,
-    created_at: '2026-02-28T00:00:00Z',
-    tags: ['debugging', 'testing', 'quality'],
-  },
-  {
-    id: '6',
-    name: 'Explorer Bot',
-    category: 'browser',
-    description: 'Automates web navigation, form filling, data extraction, and screenshot capture across any website.',
-    creator_name: 'automators',
-    deploy_count: 1100,
-    rating: 4.4,
-    created_at: '2026-03-15T00:00:00Z',
-    tags: ['automation', 'scraping', 'web'],
-  },
+  { id: '1', name: 'Code Review Wizard',  category: 'agent',    description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.', creator_name: 'devtools_hq',  deploy_count: 2840, rating: 4.8, created_at: '2026-01-15T00:00:00Z', tags: ['code','review','security'] },
+  { id: '2', name: 'SEO Scribe',          category: 'prompt',   description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a simple keyword list.',          creator_name: 'marketers',    deploy_count: 1650, rating: 4.5, created_at: '2026-02-10T00:00:00Z', tags: ['seo','content','writing'] },
+  { id: '3', name: 'SQL Craftsperson',    category: 'skill',    description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite with clear explanations.',          creator_name: 'dataeng',      deploy_count: 3200, rating: 4.9, created_at: '2026-01-20T00:00:00Z', tags: ['sql','database','data'] },
+  { id: '4', name: 'Research Conductor',  category: 'workflow',  description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',       creator_name: 'researchers',  deploy_count: 890,  rating: 4.3, created_at: '2026-03-01T00:00:00Z', tags: ['research','workflow','reports'] },
+  { id: '5', name: 'Bug Hunter Pro',      category: 'agent',    description: 'Scans code for common bug patterns, off-by-one errors, null pointer risks, and silent runtime exceptions.',         creator_name: 'debuggers',    deploy_count: 1420, rating: 4.6, created_at: '2026-02-28T00:00:00Z', tags: ['debugging','testing','quality'] },
+  { id: '6', name: 'Explorer Bot',        category: 'browser',  description: 'Automates web navigation, form filling, data extraction, and screenshot capture across any website.',               creator_name: 'automators',   deploy_count: 1100, rating: 4.4, created_at: '2026-03-15T00:00:00Z', tags: ['automation','scraping','web'] },
+  { id: '7', name: 'Cold Email Machine',  category: 'prompt',   description: 'Writes high-converting cold email sequences personalized to any industry, pain point, or buyer persona.',           creator_name: 'salescraft',   deploy_count: 2100, rating: 4.7, created_at: '2026-02-05T00:00:00Z', tags: ['email','sales','copywriting'] },
+  { id: '8', name: 'LinkedIn Post Pro',   category: 'prompt',   description: 'Generates viral LinkedIn posts that drive engagement: hooks, stories, carousels, and thought leadership content.',  creator_name: 'contentguild', deploy_count: 1780, rating: 4.6, created_at: '2026-03-10T00:00:00Z', tags: ['linkedin','social','content'] },
+  { id: '9', name: 'Market Radar',        category: 'agent',    description: 'Tracks competitor moves, industry shifts, and emerging trends across markets. Weekly briefing format.',             creator_name: 'strategos',    deploy_count: 980,  rating: 4.4, created_at: '2026-01-28T00:00:00Z', tags: ['research','market','strategy'] },
+  { id: '10', name: 'Pitch Deck Writer',  category: 'workflow',  description: 'Creates investor-ready pitch decks from a simple brief. Covers problem, solution, traction, and ask.',            creator_name: 'foundry',      deploy_count: 1340, rating: 4.5, created_at: '2026-03-20T00:00:00Z', tags: ['pitch','startup','investor'] },
+  { id: '11', name: 'Brand Voice Guide',  category: 'skill',    description: 'Analyzes your existing content and synthesizes a reusable brand voice guide with tone, vocabulary, and examples.',  creator_name: 'brandcraft',   deploy_count: 760,  rating: 4.3, created_at: '2026-02-18T00:00:00Z', tags: ['branding','voice','content'] },
+  { id: '12', name: 'Content Team',       category: 'team',     description: 'A coordinated 4-agent team: SEO writer, social scheduler, cold email specialist, and research summarizer.',         creator_name: '23rdgen',      deploy_count: 3500, rating: 4.9, created_at: '2026-01-10T00:00:00Z', tags: ['team','content','marketing'] },
 ]
 
-const TABS: { id: TabCategory; label: string }[] = [
+const TYPE_TABS: { id: TypeFilter; label: string }[] = [
   { id: 'all',      label: 'All' },
   { id: 'agent',    label: 'Agents' },
   { id: 'prompt',   label: 'Prompts' },
   { id: 'skill',    label: 'Skills' },
   { id: 'workflow', label: 'Workflows' },
   { id: 'team',     label: 'Teams' },
-  { id: 'browser',  label: 'Browser' },
 ]
+
+const CATEGORY_LABEL: Record<string, string> = {
+  'cold-emailing':      'Cold Emailing',
+  'script-writing':     'Script Writing',
+  'blog-posts':         'Blog Posts',
+  'ad-copywriting':     'Ad Copywriting',
+  'linkedin-posts':     'LinkedIn Posts',
+  'market-research':    'Market Research',
+  'competitor-analysis':'Competitor Analysis',
+  'literature-review':  'Literature Review',
+  'trend-spotting':     'Trend Spotting',
+  'code-review':        'Code Review',
+  'bug-fixing':         'Bug Fixing',
+  'api-integration':    'API Integration',
+  'documentation':      'Documentation',
+  'sales-automation':   'Sales Automation',
+  'lead-generation':    'Lead Generation',
+  'customer-support':   'Customer Support',
+  'pitch-decks':        'Pitch Decks',
+  'image-prompts':      'Image Prompts',
+  'storytelling':       'Storytelling',
+  'brand-voice':        'Brand Voice',
+  'social-content':     'Social Content',
+  'task-management':    'Task Management',
+  'meeting-summaries':  'Meeting Summaries',
+  'email-drafting':     'Email Drafting',
+  'data-analysis':      'Data Analysis',
+}
 
 function CardSkeleton() {
   return (
     <div
-      className="flex flex-col gap-3 p-4 rounded-[14px] border animate-pulse"
-      style={{ background: '#12121A', borderColor: 'rgba(124,106,158,0.1)' }}
+      style={{
+        background: '#F0E6D0',
+        border: '2px solid #0A0A0F',
+        boxShadow: '4px 4px 0px #0A0A0F',
+        padding: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}
+      className="animate-pulse"
     >
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-lg shrink-0" style={{ background: '#1C1920' }} />
-        <div className="flex-1 pt-0.5 space-y-2">
-          <div className="h-3 w-14 rounded-full" style={{ background: '#1C1920' }} />
-          <div className="h-4 w-28 rounded" style={{ background: '#1C1920' }} />
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+        <div style={{ width: 40, height: 40, background: '#D4C9A8', flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ height: 10, width: 60, background: '#D4C9A8' }} />
+          <div style={{ height: 14, width: 140, background: '#D4C9A8' }} />
         </div>
       </div>
-      <div className="space-y-2">
-        <div className="h-3 w-full rounded" style={{ background: '#1C1920' }} />
-        <div className="h-3 w-4/5 rounded" style={{ background: '#1C1920' }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ height: 10, background: '#D4C9A8' }} />
+        <div style={{ height: 10, width: '80%', background: '#D4C9A8' }} />
       </div>
-      <div className="flex items-center justify-between pt-1">
-        <div className="h-3 w-20 rounded" style={{ background: '#1C1920' }} />
-        <div className="h-7 w-14 rounded-full" style={{ background: '#1C1920' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ height: 10, width: 80, background: '#D4C9A8' }} />
+        <div style={{ height: 28, width: 56, background: '#D4C9A8' }} />
       </div>
     </div>
   )
 }
 
-export default function BrowsePage() {
+function BrowseContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category') || ''
+
   const [agents, setAgents] = useState<BrowseAgent[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<TabCategory>('all')
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [sort, setSort] = useState<SortOption>('trending')
   const [search, setSearch] = useState('')
 
@@ -148,18 +134,14 @@ export default function BrowsePage() {
           .from('agents')
           .select('id, name, category, description, creator_name, deploy_count, rating, created_at, tags')
           .eq('status', 'active')
-
         if (error || !data || data.length === 0) {
           setAgents(MOCK_AGENTS)
         } else {
-          // Normalize: fall back to id as name if name column missing
-          setAgents(
-            data.map(row => ({
-              ...row,
-              name: (row as BrowseAgent & { title?: string }).name ?? (row as BrowseAgent & { title?: string }).title ?? 'Untitled',
-              rating: (row as BrowseAgent).rating ?? 0,
-            })) as BrowseAgent[]
-          )
+          setAgents(data.map(row => ({
+            ...row,
+            name: (row as BrowseAgent & { title?: string }).name ?? (row as BrowseAgent & { title?: string }).title ?? 'Untitled',
+            rating: (row as BrowseAgent).rating ?? 0,
+          })) as BrowseAgent[])
         }
       } catch {
         setAgents(MOCK_AGENTS)
@@ -173,198 +155,262 @@ export default function BrowsePage() {
   const filtered = useMemo(() => {
     let result = agents
 
-    if (tab !== 'all') {
-      result = result.filter(a => a.category === tab)
+    if (typeFilter !== 'all') {
+      result = result.filter(a => a.category === typeFilter)
     }
 
     if (search.trim()) {
       const q = search.toLowerCase()
-      result = result.filter(
-        a =>
-          a.name.toLowerCase().includes(q) ||
-          a.description.toLowerCase().includes(q)
+      result = result.filter(a =>
+        a.name.toLowerCase().includes(q) || a.description.toLowerCase().includes(q)
       )
     }
 
     const sorted = [...result]
-    if (sort === 'trending') {
-      sorted.sort((a, b) => b.deploy_count - a.deploy_count)
-    } else if (sort === 'newest') {
-      sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    } else if (sort === 'top_rated') {
-      sorted.sort((a, b) => b.rating - a.rating)
-    }
+    if (sort === 'trending') sorted.sort((a, b) => b.deploy_count - a.deploy_count)
+    else if (sort === 'newest') sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    else if (sort === 'top_rated') sorted.sort((a, b) => b.rating - a.rating)
 
     return sorted
-  }, [agents, tab, sort, search])
+  }, [agents, typeFilter, sort, search])
+
+  const headingLabel = categoryParam
+    ? (CATEGORY_LABEL[categoryParam] ?? categoryParam)
+    : typeFilter !== 'all'
+    ? TYPE_TABS.find(t => t.id === typeFilter)?.label ?? 'Browse'
+    : 'Browse All'
 
   return (
-    <div className="min-h-screen">
-      {/* ── Sticky filters bar ───────────────────────────────────────── */}
+    <div style={{ minHeight: '100vh' }}>
+      {/* ── Sticky filter bar ── */}
       <div
-        className="sticky top-14 z-30 border-b backdrop-blur-md"
         style={{
-          background: 'rgba(10,10,15,0.92)',
-          borderColor: 'rgba(124,106,158,0.12)',
+          position: 'sticky',
+          top: 48,
+          zIndex: 30,
+          background: 'rgba(232,224,208,0.97)',
+          backdropFilter: 'blur(8px)',
+          borderBottom: '2px solid rgba(0,0,0,0.1)',
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          {/* Category tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 sm:pb-0 shrink-0 scrollbar-none">
-            {TABS.map(t => (
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '10px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {/* Type filter pills */}
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto' }} className="scrollbar-none">
+            {TYPE_TABS.map(t => (
               <button
                 key={t.id}
-                onClick={() => setTab(t.id)}
-                className="whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all shrink-0"
-                style={
-                  tab === t.id
-                    ? {
-                        background: 'rgba(124,106,158,0.2)',
-                        color: '#A594C4',
-                        border: '1px solid rgba(124,106,158,0.35)',
-                      }
-                    : {
-                        color: 'rgba(237,232,223,0.5)',
-                        border: '1px solid transparent',
-                      }
-                }
+                onClick={() => setTypeFilter(t.id)}
+                style={{
+                  fontFamily: 'var(--font-ibm-mono), monospace',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  padding: '5px 14px',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: '2px solid #0A0A0F',
+                  borderRadius: 0,
+                  transition: 'transform 60ms ease, box-shadow 60ms ease',
+                  background: typeFilter === t.id ? '#0A0A0F' : 'transparent',
+                  color: typeFilter === t.id ? '#E8E0D0' : '#0A0A0F',
+                  boxShadow: typeFilter === t.id ? '2px 2px 0px rgba(10,10,15,0.3)' : 'none',
+                }}
               >
                 {t.label}
               </button>
             ))}
-          </div>
 
-          <div className="flex-1 hidden sm:block" />
+            <div style={{ flex: 1 }} />
 
-          {/* Sort + Search */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
             <select
               value={sort}
               onChange={e => setSort(e.target.value as SortOption)}
-              className="text-xs px-3 py-1.5 rounded-full outline-none cursor-pointer shrink-0 appearance-none"
               style={{
-                background: '#0A0A0F',
-                border: '1px solid rgba(124,106,158,0.2)',
-                color: 'rgba(237,232,223,0.7)',
+                fontFamily: 'var(--font-ibm-mono), monospace',
+                fontSize: 11,
+                padding: '5px 12px',
+                border: '2px solid #0A0A0F',
+                borderRadius: 0,
+                background: '#F0E6D0',
+                color: '#0A0A0F',
+                cursor: 'pointer',
+                outline: 'none',
+                appearance: 'none',
+                flexShrink: 0,
               }}
             >
               <option value="trending">Trending</option>
               <option value="newest">Newest</option>
               <option value="top_rated">Top Rated</option>
             </select>
+          </div>
 
-            <div className="relative flex-1 sm:w-64">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
-                style={{ color: 'rgba(237,232,223,0.35)' }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search agents…"
-                className="w-full pl-9 pr-4 py-1.5 rounded-full text-xs outline-none placeholder:text-[rgba(237,232,223,0.3)]"
-                style={{
-                  background: '#0A0A0F',
-                  border: '1px solid rgba(124,106,158,0.2)',
-                  color: '#E8E0D0',
-                }}
-              />
-            </div>
+          {/* Search */}
+          <div style={{ position: 'relative', maxWidth: 380 }}>
+            <svg
+              style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#8A7A6A', pointerEvents: 'none' }}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search agents…"
+              style={{
+                width: '100%',
+                fontFamily: 'var(--font-ibm-mono), monospace',
+                fontSize: 12,
+                padding: '7px 12px 7px 32px',
+                border: '2px solid rgba(0,0,0,0.2)',
+                borderRadius: 0,
+                background: '#F0E6D0',
+                color: '#0A0A0F',
+                outline: 'none',
+              }}
+            />
           </div>
         </div>
       </div>
 
-      {/* ── Main grid ────────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <p className="text-xs text-[rgba(237,232,223,0.4)] mb-5">
-          {loading
-            ? 'Loading…'
-            : `${filtered.length} result${filtered.length !== 1 ? 's' : ''}${search ? ` for "${search}"` : ''}`}
+      {/* ── Content ── */}
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 24px 64px' }}>
+        <h1
+          style={{
+            fontFamily: 'var(--font-dm-serif), "DM Serif Display", serif',
+            fontSize: 28,
+            color: '#0A0A0F',
+            margin: '0 0 4px',
+          }}
+        >
+          {headingLabel}
+        </h1>
+        <p style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, color: '#8A7A6A', margin: '0 0 24px' }}>
+          {loading ? 'Loading…' : `${filtered.length} result${filtered.length !== 1 ? 's' : ''}${search ? ` for "${search}"` : ''}`}
         </p>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+            {[1,2,3,4,5,6].map(i => <CardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex items-center justify-center h-40 text-[rgba(237,232,223,0.35)] text-sm">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, color: '#8A7A6A' }}>
             No results{search ? ` for "${search}"` : ' in this category'}.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
             {filtered.map(agent => {
               const badge = CATEGORY_BADGE[agent.category] ?? CATEGORY_BADGE.agent
-              const cat = (agent.category as AgentCategory) in CATEGORY_BADGE
-                ? (agent.category as AgentCategory)
-                : 'agent'
+              const cat = (agent.category in CATEGORY_BADGE ? agent.category : 'agent') as AgentCategory
 
               return (
-                <Link key={agent.id} href={`/browse/${agent.id}`} className="group block">
+                <Link key={agent.id} href={`/browse/${agent.id}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div
-                    className="flex flex-col gap-3 p-4 rounded-[14px] border transition-all duration-200 h-full
-                                group-hover:-translate-y-0.5 group-hover:shadow-[0_4px_24px_rgba(124,106,158,0.12)]"
-                    style={{ background: '#12121A', borderColor: 'rgba(124,106,158,0.2)' }}
+                    style={{
+                      background: '#F0E6D0',
+                      border: '2px solid #0A0A0F',
+                      boxShadow: '4px 4px 0px #0A0A0F',
+                      padding: 20,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 12,
+                      height: '100%',
+                      transition: 'transform 60ms ease, box-shadow 60ms ease',
+                      cursor: 'pointer',
+                    }}
                     onMouseEnter={e => {
-                      ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(124,106,158,0.5)'
+                      const el = e.currentTarget as HTMLDivElement
+                      el.style.transform = 'translate(2px,2px)'
+                      el.style.boxShadow = '2px 2px 0px #0A0A0F'
                     }}
                     onMouseLeave={e => {
-                      ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(124,106,158,0.2)'
+                      const el = e.currentTarget as HTMLDivElement
+                      el.style.transform = ''
+                      el.style.boxShadow = '4px 4px 0px #0A0A0F'
                     }}
                   >
                     {/* Header */}
-                    <div className="flex items-start gap-3">
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                       <PixelAvatar category={cat} size={40} />
-                      <div className="flex-1 min-w-0 pt-0.5">
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <span
-                          className="inline-block text-[10px] px-2 py-0.5 rounded-full border font-medium capitalize mb-1"
                           style={{
+                            display: 'inline-block',
+                            fontFamily: 'var(--font-ibm-mono), monospace',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            padding: '2px 8px',
                             background: badge.bg,
                             color: badge.text,
-                            borderColor: badge.border,
+                            border: `1px solid ${badge.border}`,
+                            marginBottom: 4,
                           }}
                         >
                           {agent.category}
                         </span>
-                        <h3 className="text-sm font-bold text-[#E8E0D0] leading-snug truncate">
+                        <h3
+                          style={{
+                            fontFamily: 'var(--font-ibm-mono), monospace',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: '#0A0A0F',
+                            margin: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {agent.name}
                         </h3>
                       </div>
                     </div>
 
                     {/* Description */}
-                    <p className="text-xs text-[rgba(232,224,208,0.55)] leading-relaxed line-clamp-2 flex-1">
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-ibm-mono), monospace',
+                        fontSize: 12,
+                        color: '#4A3A2A',
+                        lineHeight: 1.65,
+                        margin: 0,
+                        flex: 1,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
                       {agent.description}
                     </p>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-1 mt-auto">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] text-[rgba(232,224,208,0.4)]">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, color: '#8A7A6A' }}>
                           by {agent.creator_name ?? 'anonymous'}
-                        </span>
-                        <span className="text-xs font-semibold" style={{ color: '#C4622D' }}>
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 600, color: '#C4622D' }}>
                           {agent.deploy_count.toLocaleString()} deploys
-                        </span>
+                        </div>
                       </div>
-                      <span
-                        className="text-xs px-3 py-1.5 rounded-full border transition-colors"
-                        style={{ borderColor: 'rgba(124,106,158,0.35)', color: '#A594C4' }}
+                      <div
+                        style={{
+                          fontFamily: 'var(--font-ibm-mono), monospace',
+                          fontSize: 11,
+                          fontWeight: 600,
+                          letterSpacing: '0.06em',
+                          color: '#0A0A0F',
+                          border: '2px solid #0A0A0F',
+                          padding: '4px 10px',
+                          background: 'transparent',
+                        }}
                       >
                         View →
-                      </span>
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -374,5 +420,17 @@ export default function BrowsePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, color: '#8A7A6A' }}>
+        Loading…
+      </div>
+    }>
+      <BrowseContent />
+    </Suspense>
   )
 }

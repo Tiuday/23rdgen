@@ -9,47 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        obsidian: '#141210',
-        surface: '#1C1916',
-        elevated: '#242018',
-        'border-subtle': '#2A2520',
-        'border-bright': '#332E28',
-        parchment: {
-          DEFAULT: '#EDE8DF',
-          muted: 'rgba(237, 232, 223, 0.55)',
-          subtle: 'rgba(237, 232, 223, 0.25)',
-        },
+        obsidian: '#0A0A0F',
+        parchment: '#E8E0D0',
+        ivory: '#F0E6D0',
+        maroon: '#2A0A0A',
+        mahogany: '#2A1A0E',
         violet: {
-          DEFAULT: '#7C6B9E',
-          soft: '#A594C4',
-          tint: 'rgba(124, 107, 158, 0.15)',
+          DEFAULT: '#7C6A9E',
+          soft: '#9B88BF',
         },
-        ember: {
-          DEFAULT: '#D4521E',
-          tint: 'rgba(212, 82, 30, 0.12)',
-        },
-        sage: {
-          DEFAULT: '#3A6B45',
-          tint: 'rgba(58, 107, 69, 0.15)',
-        },
-        clay: {
-          DEFAULT: '#C4785A',
-          tint: 'rgba(196, 120, 90, 0.12)',
-        },
-        rose: {
-          DEFAULT: '#8C3A56',
-          tint: 'rgba(140, 58, 86, 0.12)',
-        },
-        slate: {
-          DEFAULT: '#3A4560',
-          tint: 'rgba(58, 69, 96, 0.15)',
-        },
+        ember: '#C4622D',
+        sage: '#6B8F71',
+        clay: '#A0785A',
+        slate: '#5A6A7A',
+        gold: '#B8960C',
+        aged: '#D4C9A8',
       },
       borderRadius: {
-        pill: '100px',
-        card: '14px',
-        input: '10px',
-        modal: '16px',
+        pill: '0px',
+        card: '0px',
+        input: '0px',
+        modal: '0px',
       },
       fontFamily: {
         serif: ['DM Serif Display', 'Georgia', 'serif'],

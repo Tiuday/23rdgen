@@ -1,34 +1,24 @@
 :root {
-  --obsidian: #141210;
-  --surface: #1C1916;
-  --elevated: #242018;
-  --border: #2A2520;
-  --border-bright: #332E28;
-  --parchment: #EDE8DF;
-  --parchment-muted: rgba(237, 232, 223, 0.55);
-  --parchment-subtle: rgba(237, 232, 223, 0.25);
-  --violet: #7C6B9E;
-  --violet-soft: #A594C4;
-  --violet-tint: rgba(124, 107, 158, 0.15);
-  --ember: #D4521E;
-  --ember-tint: rgba(212, 82, 30, 0.12);
-  --sage: #3A6B45;
-  --sage-tint: rgba(58, 107, 69, 0.15);
-  --clay: #C4785A;
-  --clay-tint: rgba(196, 120, 90, 0.12);
-  --rose: #8C3A56;
-  --rose-tint: rgba(140, 58, 86, 0.12);
-  --slate: #3A4560;
-  --slate-tint: rgba(58, 69, 96, 0.15);
+  /* Core palette */
+  --obsidian: #0A0A0F;
+  --maroon: #2A0A0A;
+  --mahogany: #2A1A0E;
+  --parchment: #E8E0D0;
+  --ivory: #F0E6D0;
+  --aged: #D4C9A8;
 
-  /* Luxury warmth additions — use sparingly, one or two per component */
-  --aged-paper: #D4C9A8;        /* secondary text, muted labels */
-  --warm-ivory: #F0E6D0;        /* primary headings only */
-  --deep-mahogany: #2A1A0E;     /* card background alternative */
-  --tarnished-gold: #B8960C;    /* featured badges only */
+  /* Accent palette */
+  --violet: #7C6A9E;
+  --violet-soft: #9B88BF;
+  --ember: #C4622D;
+  --sage: #6B8F71;
+  --clay: #A0785A;
+  --slate: #5A6A7A;
+  --gold: #B8960C;
 
-  --radius-pill: 100px;
-  --radius-card: 14px;
-  --radius-input: 10px;
-  --radius-modal: 16px;
+  /* Radius — neobrutalist zero */
+  --radius-pill: 0px;
+  --radius-card: 0px;
+  --radius-input: 0px;
+  --radius-modal: 0px;
 }

@@ -128,8 +128,8 @@ export default function PixelAvatar({ category, className, size = 36 }: PixelAva
   const Pixel = PIXELS[category] ?? AgentPixel
   return (
     <div
-      className={cn('rounded-lg bg-elevated flex items-center justify-center shrink-0', className)}
-      style={{ width: size, height: size }}
+      className={cn('flex items-center justify-center shrink-0', className)}
+      style={{ width: size, height: size, background: 'transparent' }}
     >
       <Pixel c={color} />
     </div>
