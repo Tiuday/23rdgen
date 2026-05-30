@@ -383,7 +383,7 @@ export default function HomePage() {
           {/* ── LEFT COLUMN ─────────────────────────────────────── */}
           <div className="hero-left">
             <h1 className="hero-h1" style={{
-              fontFamily:  'var(--font-dm-serif), DM Serif Display, serif',
+              fontFamily:  "'Akt', var(--font-dm-serif), DM Serif Display, serif",
               fontSize:    'clamp(52px, 5.5vw, 88px)',
               lineHeight:  1.04,
               color:       '#0A0A0F',
