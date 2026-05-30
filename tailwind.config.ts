@@ -52,7 +52,9 @@ const config: Config = {
         modal: '16px',
       },
       fontFamily: {
-        sans: ['Inter', 'var(--font-inter)', 'sans-serif'],
+        serif: ['DM Serif Display', 'Georgia', 'serif'],
+        mono: ['IBM Plex Mono', 'Courier New', 'monospace'],
+        sans: ['IBM Plex Mono', 'Courier New', 'monospace'],
       },
     },
   },

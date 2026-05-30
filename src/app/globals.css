@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -346,6 +347,38 @@
   50% { transform: translateY(4px) scaleX(1.003); }
 }
 
+/* ── Footer wordmark drift ─────────────────────────────────────────── */
+@keyframes footer-drift {
+  0%, 100% { letter-spacing: -0.02em; }
+  50% { letter-spacing: 0.01em; }
+}
+
+/* ── Footer bottom bar fade in ─────────────────────────────────────── */
+@keyframes footer-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Footer column entrance ────────────────────────────────────────── */
+.footer-col {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+.footer-col.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Hide scrollbar utility ────────────────────────────────────────── */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -365,8 +398,11 @@
     scroll-behavior: smooth;
     cursor: auto;
   }
-  h1, h2, h3 {
-    font-family: var(--font-heading);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading) !important;
+  }
+  body, p, span, a, button, input, label, div {
+    font-family: var(--font-mono) !important;
   }
   ::selection {
     background: rgba(124, 107, 158, 0.35);

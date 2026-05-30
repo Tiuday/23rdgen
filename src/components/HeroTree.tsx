@@ -77,7 +77,7 @@ export default function HeroTree() {
   return (
     <div style={{
       position: 'absolute',
-      right: '-5vw',
+      right: '-8vw',
       bottom: 0,
       height: '105vh',
       width: '65vw',
