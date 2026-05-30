@@ -4,7 +4,7 @@ import Link from 'next/link'
 import SearchModal from '@/components/search/SearchModal'
 import AnimatedTextCycle from '@/components/ui/animated-text-cycle'
 import HeroTree from '@/components/HeroTree'
-import TreeRoots from '@/components/TreeRoots'
+import AgentCardsSection from '@/components/sections/AgentCardsSection'
 
 const NAV_ITEMS = [
   { label: 'Browse All', href: '/browse' },
@@ -284,12 +284,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── POST-HERO: roots spanning sections 2 & 3 ─────────────── */}
-      <div style={{ position: 'relative', overflow: 'visible', minHeight: 320 }}>
-        <TreeRoots />
-        {/* Section content sits above roots */}
-        <div style={{ position: 'relative', zIndex: 2 }} />
-      </div>
+      {/* ── SECTION 2: Agent Cards ─────────────────────────────── */}
+      <AgentCardsSection />
 
       {/* ── BOTTOM TICKER ─────────────────────────────────────────── */}
       <div style={{
