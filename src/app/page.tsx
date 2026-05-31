@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Menu, X, Search } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, Search, LayoutGrid, PenLine, BookOpen, Code2, Briefcase, Palette, CheckCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import HeroTree from '@/components/HeroTree'
 import TreeRoots from '@/components/TreeRoots'
@@ -9,6 +10,7 @@ import TreeRoots from '@/components/TreeRoots'
 const SIDEBAR_CATS = [
   {
     group: 'WRITING',
+    icon: PenLine,
     items: [
       { label: 'Cold Emailing',    slug: 'cold-emailing' },
       { label: 'Script Writing',   slug: 'script-writing' },
@@ -19,6 +21,7 @@ const SIDEBAR_CATS = [
   },
   {
     group: 'RESEARCH',
+    icon: BookOpen,
     items: [
       { label: 'Market Research',     slug: 'market-research' },
       { label: 'Competitor Analysis', slug: 'competitor-analysis' },
@@ -28,6 +31,7 @@ const SIDEBAR_CATS = [
   },
   {
     group: 'CODING',
+    icon: Code2,
     items: [
       { label: 'Code Review',     slug: 'code-review' },
       { label: 'Bug Fixing',      slug: 'bug-fixing' },
@@ -37,6 +41,7 @@ const SIDEBAR_CATS = [
   },
   {
     group: 'BUSINESS',
+    icon: Briefcase,
     items: [
       { label: 'Sales Automation', slug: 'sales-automation' },
       { label: 'Lead Generation',  slug: 'lead-generation' },
@@ -46,6 +51,7 @@ const SIDEBAR_CATS = [
   },
   {
     group: 'CREATIVE',
+    icon: Palette,
     items: [
       { label: 'Image Prompts',  slug: 'image-prompts' },
       { label: 'Storytelling',   slug: 'storytelling' },
@@ -55,6 +61,7 @@ const SIDEBAR_CATS = [
   },
   {
     group: 'PRODUCTIVITY',
+    icon: CheckCheck,
     items: [
       { label: 'Task Management',   slug: 'task-management' },
       { label: 'Meeting Summaries', slug: 'meeting-summaries' },
@@ -64,13 +71,26 @@ const SIDEBAR_CATS = [
   },
 ]
 
+const INACTIVE = '#8A8A92'
+const AKT = "'Akt', system-ui, -apple-system, sans-serif"
+
 export default function HomePage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const searchRef = useRef<HTMLInputElement>(null)
   const treeRef = useRef<HTMLDivElement>(null)
   const rootsRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+
+  function toggleGroup(group: string) {
+    setExpandedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(group)) next.delete(group)
+      else next.add(group)
+      return next
+    })
+  }
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -103,6 +123,8 @@ export default function HomePage() {
       router.push(`/browse?q=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
+
+  const SIDEBAR_WIDTH = 248
 
   return (
     <>
@@ -139,126 +161,207 @@ export default function HomePage() {
         <HeroTree />
       </div>
 
-      {/* Collapsible category sidebar */}
+      {/* Dark floating sidebar */}
       <aside
         style={{
-          position: 'fixed', left: 0, top: 0,
-          width: 220, height: '100vh',
-          overflowY: 'auto', zIndex: 150,
-          background: 'rgba(240,230,208,0.97)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderRight: '2px solid rgba(10,10,15,0.15)',
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-220px)',
-          transition: 'transform 0.25s ease',
-          paddingTop: 64, paddingBottom: 32,
+          position: 'fixed',
+          top: 16,
+          left: sidebarOpen ? 16 : -(SIDEBAR_WIDTH + 16),
+          bottom: 16,
+          width: SIDEBAR_WIDTH,
+          zIndex: 150,
+          background: '#0A0A0F',
+          borderRadius: 20,
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          transition: 'left 0.25s ease',
         }}
       >
-        <div style={{ padding: '0 16px 12px' }}>
-          <div style={{
-            fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-            fontSize: 10, textTransform: 'uppercase',
-            letterSpacing: '0.12em', color: '#7C6A9E',
-          }}>
-            CATEGORIES
-          </div>
+        {/* Logo */}
+        <div style={{ padding: '20px 16px 16px', flexShrink: 0 }}>
+          <Link href="/" style={{ display: 'block', textDecoration: 'none', lineHeight: 0 }}>
+            <Image
+              src="/inspiration/logo.png"
+              alt="23rdGen"
+              width={110}
+              height={32}
+              style={{ objectFit: 'contain', objectPosition: 'left center' }}
+              priority
+            />
+          </Link>
         </div>
 
-        {SIDEBAR_CATS.map(cat => (
-          <div key={cat.group} style={{ marginTop: 16 }}>
-            <div style={{
-              fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-              fontSize: 11, textTransform: 'uppercase',
-              letterSpacing: '0.1em', color: '#5A4A7A',
-              padding: '0 16px', marginBottom: 4,
-            }}>
-              {cat.group}
-            </div>
-            {cat.items.map(item => (
-              <Link
-                key={item.slug}
-                href={`/browse?category=${item.slug}`}
-                style={{
-                  display: 'block',
-                  fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                  fontSize: 13, color: '#2A1A0E',
-                  textDecoration: 'none', padding: '6px 16px',
-                  transition: 'background 120ms',
-                }}
-                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(124,106,158,0.12)')}
-                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
-              >
-                {item.label}
-              </Link>
-            ))}
+        {/* Scrollable nav */}
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px' }} className="scrollbar-none">
+          {/* Browse All */}
+          <div style={{ marginBottom: 4 }}>
+            <Link
+              href="/browse"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '9px 12px', borderRadius: 12,
+                textDecoration: 'none', fontFamily: AKT,
+                fontSize: 13, color: INACTIVE,
+                transition: 'background 100ms, color 100ms',
+              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#16161C'; el.style.color = '#C8C8D0' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'transparent'; el.style.color = INACTIVE }}
+            >
+              <LayoutGrid size={15} />
+              <span>Browse All</span>
+            </Link>
           </div>
-        ))}
+
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '8px 4px 10px' }} />
+
+          {/* Category groups */}
+          <nav>
+            {SIDEBAR_CATS.map(cat => {
+              const expanded = expandedGroups.has(cat.group)
+              const Icon = cat.icon
+              return (
+                <div key={cat.group} style={{ marginBottom: 2 }}>
+                  <button
+                    onClick={() => toggleGroup(cat.group)}
+                    style={{
+                      display: 'flex', alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%', padding: '9px 12px', borderRadius: 12,
+                      border: '1px solid transparent', background: 'transparent',
+                      cursor: 'pointer', color: INACTIVE, fontFamily: AKT,
+                      fontSize: 13, fontWeight: 500,
+                      transition: 'background 100ms, color 100ms',
+                    }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = '#16161C'; el.style.color = '#C8C8D0' }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = 'transparent'; el.style.color = INACTIVE }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <Icon size={15} />
+                      <span>{cat.group}</span>
+                    </span>
+                    {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  </button>
+
+                  {expanded && (
+                    <div
+                      style={{
+                        marginLeft: 16, paddingLeft: 12,
+                        borderLeft: '1px solid rgba(255,255,255,0.07)',
+                        marginTop: 2, marginBottom: 4,
+                      }}
+                    >
+                      {cat.items.map(item => (
+                        <Link
+                          key={item.slug}
+                          href={`/browse?category=${item.slug}`}
+                          style={{
+                            display: 'block', padding: '7px 10px', borderRadius: 12,
+                            fontFamily: AKT, fontSize: 13,
+                            color: INACTIVE, textDecoration: 'none',
+                            marginBottom: 1,
+                            transition: 'background 100ms, color 100ms',
+                          }}
+                          onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#16161C'; el.style.color = '#C8C8D0' }}
+                          onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'transparent'; el.style.color = INACTIVE }}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </nav>
+        </div>
       </aside>
 
-      {/* Sidebar toggle */}
+      {/* Sidebar toggle button */}
       <button
         onClick={() => setSidebarOpen(v => !v)}
         aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
         style={{
           position: 'fixed', top: 20, left: 20, zIndex: 200,
-          width: 36, height: 36,
-          border: '2px solid #0A0A0F',
-          boxShadow: '2px 2px 0px #0A0A0F',
-          background: '#F0E6D0', borderRadius: 0,
+          width: 34, height: 34,
+          background: 'rgba(10,10,15,0.85)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 8,
+          backdropFilter: 'blur(8px)',
           cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#8A8A92',
+          transition: 'color 100ms ease',
         }}
+        onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#C8C8D0')}
+        onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#8A8A92')}
       >
-        {sidebarOpen
-          ? <X size={18} color="#0A0A0F" />
-          : <Menu size={18} color="#0A0A0F" />
-        }
+        {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
       </button>
 
-      {/* 23rdGen wordmark */}
-      <Link href="/" style={{
-        position: 'fixed', top: 16, left: 68, zIndex: 200,
-        fontFamily: 'var(--font-dm-serif), DM Serif Display, serif',
-        fontStyle: 'italic', fontSize: 20, color: '#0A0A0F',
-        textDecoration: 'none', lineHeight: 1, userSelect: 'none',
-      }}>
-        23rdGen
+      {/* Floating logo — top left, always visible */}
+      <Link
+        href="/"
+        style={{
+          position: 'fixed', top: 16, left: 68, zIndex: 200,
+          textDecoration: 'none', lineHeight: 0, userSelect: 'none',
+          animation: 'heroLogoIn 0.5s ease-out both',
+        }}
+      >
+        <Image
+          src="/inspiration/logo.png"
+          alt="23rdGen"
+          width={90}
+          height={28}
+          style={{ objectFit: 'contain' }}
+          priority
+        />
       </Link>
 
-      {/* Top-right auth */}
+      {/* Top-right auth buttons */}
       <div style={{
-        position: 'fixed', top: 12, right: 24, zIndex: 200,
-        display: 'flex', alignItems: 'center', gap: 16,
+        position: 'fixed', top: 14, right: 24, zIndex: 200,
+        display: 'flex', alignItems: 'center', gap: 10,
       }}>
-        <Link href="/login" style={{
-          fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-          fontSize: 13, color: '#2A1A0E', textDecoration: 'none',
-        }}>
+        <Link
+          href="/login"
+          style={{
+            fontFamily: AKT, fontSize: 13, fontWeight: 400,
+            color: '#8A8A92', textDecoration: 'none',
+            transition: 'color 120ms ease',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#C8C8D0')}
+          onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#8A8A92')}
+        >
           Log in
         </Link>
-        <Link href="/signup" style={{
-          fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-          fontSize: 12, color: '#E8E0D0',
-          background: '#8B1A1A',
-          border: '2px solid #E8E0D0',
-          boxShadow: '2px 2px 0px #E8E0D0',
-          borderRadius: 0, padding: '8px 18px',
-          textDecoration: 'none',
-          textTransform: 'uppercase', letterSpacing: '0.06em',
-          display: 'inline-block',
-        }}>
+        <Link
+          href="/signup"
+          style={{
+            fontFamily: AKT, fontSize: 12, fontWeight: 500,
+            letterSpacing: '0.04em',
+            color: '#F0E6D0',
+            background: '#16161C',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8, padding: '5px 14px',
+            textDecoration: 'none', display: 'inline-block',
+            transition: 'background 120ms ease, color 120ms ease',
+          }}
+          onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#202028'; el.style.color = '#FFFFFF' }}
+          onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = '#16161C'; el.style.color = '#F0E6D0' }}
+        >
           Sign Up
         </Link>
       </div>
 
-      {/* Main — content shifts right when sidebar opens */}
+      {/* Main content */}
       <main style={{
         position: 'relative', zIndex: 10,
         minHeight: '100vh',
-        marginLeft: sidebarOpen ? 220 : 0,
-        transition: 'margin-left 0.25s ease',
       }}>
-        {/* Hero: logo centered at 38% vh, search bar below */}
+        {/* Hero: logo mark centered at 38% vh, search bar below */}
         <div style={{
           position: 'absolute',
           top: '38%', left: '50%',

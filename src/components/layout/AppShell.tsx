@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import Sidebar from './Sidebar'
 
 const PIXEL_CHARS = [
@@ -12,13 +13,19 @@ const PIXEL_CHARS = [
   { emoji: '👾', style: { bottom: '15%', left: '5%', animation: 'drift-5 40s ease-in-out infinite', animationDelay: '-20s' } },
 ]
 
+const AKT = "'Akt', system-ui, -apple-system, sans-serif"
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const pathname = usePathname()
 
   if (pathname === '/') return <>{children}</>
 
   const isAuthPage = pathname === '/login' || pathname === '/signup'
+
+  // Desktop left margin: sidebar (248 or 64) + 16 left gap + 16 right gap
+  const mainMarginLeft = sidebarCollapsed ? 96 : 280
 
   return (
     <>
@@ -42,87 +49,59 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       ))}
 
-      {/* Floating 23rdGen wordmark — desktop only, right of sidebar */}
-      {!isAuthPage && (
-        <Link
-          href="/"
-          className="hidden md:block"
-          style={{
-            position: 'fixed',
-            top: 16,
-            left: 236,
-            zIndex: 100,
-            fontFamily: 'var(--font-dm-serif), "DM Serif Display", Georgia, serif',
-            fontStyle: 'italic',
-            fontSize: 20,
-            color: '#0A0A0F',
-            textDecoration: 'none',
-            letterSpacing: '-0.01em',
-            lineHeight: 1,
-            userSelect: 'none',
-            opacity: 0.85,
-          }}
-          onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}
-          onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.85')}
-        >
-          23rdGen
-        </Link>
-      )}
-
       {/* Floating auth buttons — top right */}
       {!isAuthPage && (
         <div
           style={{
             position: 'fixed',
-            top: 12,
+            top: 14,
             right: 24,
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: 10,
           }}
         >
           <Link
             href="/login"
             style={{
-              fontFamily: 'var(--font-ibm-mono), "IBM Plex Mono", monospace',
-              fontSize: 12,
-              color: '#2A1A0E',
+              fontFamily: AKT,
+              fontSize: 13,
+              fontWeight: 400,
+              color: '#8A8A92',
               textDecoration: 'none',
-              opacity: 0.65,
-              transition: 'opacity 120ms ease',
+              transition: 'color 120ms ease',
             }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.65')}
+            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#C8C8D0')}
+            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#8A8A92')}
           >
             Log in
           </Link>
           <Link
             href="/signup"
             style={{
-              fontFamily: 'var(--font-ibm-mono), "IBM Plex Mono", monospace',
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
+              fontFamily: AKT,
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: '0.04em',
               color: '#F0E6D0',
-              background: '#0A0A0F',
-              border: '2px solid #0A0A0F',
-              boxShadow: '2px 2px 0px rgba(10,10,15,0.35)',
-              padding: '4px 12px',
+              background: '#16161C',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 8,
+              padding: '5px 14px',
               textDecoration: 'none',
               display: 'inline-block',
-              transition: 'transform 60ms ease, box-shadow 60ms ease',
+              transition: 'background 120ms ease, color 120ms ease',
             }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLAnchorElement
-              el.style.transform = 'translate(1px,1px)'
-              el.style.boxShadow = '1px 1px 0px rgba(10,10,15,0.35)'
+              el.style.background = '#202028'
+              el.style.color = '#FFFFFF'
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLAnchorElement
-              el.style.transform = ''
-              el.style.boxShadow = '2px 2px 0px rgba(10,10,15,0.35)'
+              el.style.background = '#16161C'
+              el.style.color = '#F0E6D0'
             }}
           >
             Sign Up
@@ -130,8 +109,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/profile" style={{ textDecoration: 'none' }}>
             <div
               style={{
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 borderRadius: '50%',
                 background: 'rgba(10,10,15,0.06)',
                 border: '1.5px solid rgba(10,10,15,0.18)',
@@ -139,7 +118,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                fontFamily: 'var(--font-ibm-mono), monospace',
+                fontFamily: AKT,
                 fontSize: 11,
                 color: '#2A1A0E',
                 userSelect: 'none',
@@ -163,12 +142,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             top: 14,
             left: 16,
             zIndex: 100,
-            background: 'rgba(240,230,208,0.92)',
-            border: '1.5px solid rgba(10,10,15,0.18)',
-            color: '#2A1A0E',
+            background: 'rgba(10,10,15,0.85)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8,
+            color: '#8A8A92',
             cursor: 'pointer',
             padding: '6px 8px',
-            backdropFilter: 'blur(4px)',
+            backdropFilter: 'blur(8px)',
           }}
         >
           <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
@@ -180,12 +160,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       {!isAuthPage && (
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(v => !v)}
+        />
       )}
 
       <main
-        className={`flex-1 min-h-screen ${isAuthPage ? '' : 'md:ml-[220px]'}`}
-        style={{ position: 'relative', zIndex: 10 }}
+        className={`flex-1 min-h-screen ${isAuthPage ? '' : sidebarCollapsed ? 'md:ml-[96px]' : 'md:ml-[280px]'}`}
+        style={{ position: 'relative', zIndex: 10, transition: 'margin-left 200ms ease' }}
       >
         {children}
       </main>
