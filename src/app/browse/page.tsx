@@ -3,8 +3,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import PixelAvatar from '@/components/mascot/PixelAvatar'
-import type { AgentCategory } from '@/types/agent'
+import CartoonAvatar, { stableAvatarIdx } from '@/components/mascot/CartoonAvatar'
 
 type TypeFilter = 'all' | 'agent' | 'prompt' | 'skill' | 'workflow' | 'team'
 type SortOption = 'trending' | 'newest' | 'top_rated'
@@ -29,6 +28,17 @@ const CATEGORY_BADGE: Record<string, { bg: string; text: string; border: string 
   team:     { bg: '#F5D8DC', text: '#6B1E28', border: '#A05060' },
   browser:  { bg: '#D8E0EC', text: '#1E2E50', border: '#5A6A7A' },
 }
+
+const TYPE_HEADER: Record<string, string> = {
+  agent:    '#F5D76E',
+  prompt:   '#A8D8EA',
+  skill:    '#B5EAD7',
+  workflow: '#E8A0BF',
+  team:     '#C9B1FF',
+  browser:  '#A8D8EA',
+}
+
+const AKT = "'Akt', system-ui, -apple-system, sans-serif"
 
 const MOCK_AGENTS: BrowseAgent[] = [
   { id: '1', name: 'Code Review Wizard',  category: 'agent',    description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.', creator_name: 'devtools_hq',  deploy_count: 2840, rating: 4.8, created_at: '2026-01-15T00:00:00Z', tags: ['code','review','security'] },
@@ -86,30 +96,20 @@ function CardSkeleton() {
   return (
     <div
       style={{
-        background: '#F0E6D0',
         border: '2px solid #0A0A0F',
-        boxShadow: '4px 4px 0px #0A0A0F',
-        padding: 20,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 12,
+        boxShadow: '4px 4px 0 #0A0A0F',
+        borderRadius: 16,
+        overflow: 'hidden',
+        background: '#FEFBF5',
       }}
       className="animate-pulse"
     >
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        <div style={{ width: 40, height: 40, background: '#D4C9A8', flexShrink: 0 }} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ height: 10, width: 60, background: '#D4C9A8' }} />
-          <div style={{ height: 14, width: 140, background: '#D4C9A8' }} />
-        </div>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ height: 10, background: '#D4C9A8' }} />
-        <div style={{ height: 10, width: '80%', background: '#D4C9A8' }} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ height: 10, width: 80, background: '#D4C9A8' }} />
-        <div style={{ height: 28, width: 56, background: '#D4C9A8' }} />
+      <div style={{ height: 140, background: '#D4C9A8' }} />
+      <div style={{ padding: '16px 18px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ height: 16, width: 140, background: '#D4C9A8', borderRadius: 2 }} />
+        <div style={{ height: 11, background: '#D4C9A8', borderRadius: 2 }} />
+        <div style={{ height: 11, width: '75%', background: '#D4C9A8', borderRadius: 2 }} />
+        <div style={{ height: 36, background: '#D4C9A8', marginTop: 4 }} />
       </div>
     </div>
   )
@@ -300,117 +300,136 @@ function BrowseContent() {
             No results{search ? ` for "${search}"` : ' in this category'}.
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
             {filtered.map(agent => {
-              const badge = CATEGORY_BADGE[agent.category] ?? CATEGORY_BADGE.agent
-              const cat = (agent.category in CATEGORY_BADGE ? agent.category : 'agent') as AgentCategory
+              const headerBg = TYPE_HEADER[agent.category] ?? '#F5D76E'
+              const avatarIdx = stableAvatarIdx(agent.id)
 
               return (
-                <Link key={agent.id} href={`/browse/${agent.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <Link key={agent.id} href={`/browse/${agent.id}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
                   <div
                     style={{
-                      background: '#F0E6D0',
                       border: '2px solid #0A0A0F',
-                      boxShadow: '4px 4px 0px #0A0A0F',
-                      padding: 20,
+                      boxShadow: '4px 4px 0 #0A0A0F',
+                      borderRadius: 16,
+                      background: '#FEFBF5',
+                      overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 12,
                       height: '100%',
-                      transition: 'transform 60ms ease, box-shadow 60ms ease',
+                      transition: 'transform 120ms ease, box-shadow 120ms ease',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLDivElement
-                      el.style.transform = 'translate(2px,2px)'
-                      el.style.boxShadow = '2px 2px 0px #0A0A0F'
+                      el.style.transform = 'translate(-2px,-2px)'
+                      el.style.boxShadow = '6px 6px 0 #0A0A0F'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLDivElement
                       el.style.transform = ''
-                      el.style.boxShadow = '4px 4px 0px #0A0A0F'
+                      el.style.boxShadow = '4px 4px 0 #0A0A0F'
                     }}
                   >
-                    {/* Header */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                      <PixelAvatar category={cat} size={40} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            fontFamily: 'var(--font-ibm-mono), monospace',
-                            fontSize: 10,
-                            fontWeight: 600,
-                            letterSpacing: '0.08em',
-                            textTransform: 'uppercase',
-                            padding: '2px 8px',
-                            background: badge.bg,
-                            color: badge.text,
-                            border: `1px solid ${badge.border}`,
-                            marginBottom: 4,
-                          }}
-                        >
-                          {agent.category}
-                        </span>
-                        <h3
-                          style={{
-                            fontFamily: 'var(--font-ibm-mono), monospace',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            color: '#0A0A0F',
-                            margin: 0,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {agent.name}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <p
+                    {/* Colored header with big avatar */}
+                    <div
                       style={{
-                        fontFamily: 'var(--font-ibm-mono), monospace',
-                        fontSize: 12,
-                        color: '#4A3A2A',
-                        lineHeight: 1.65,
-                        margin: 0,
-                        flex: 1,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        background: headerBg,
+                        padding: '22px 18px 16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 10,
+                        flexShrink: 0,
                       }}
                     >
-                      {agent.description}
-                    </p>
-
-                    {/* Footer */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, color: '#8A7A6A' }}>
-                          by {agent.creator_name ?? 'anonymous'}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 600, color: '#C4622D' }}>
-                          {agent.deploy_count.toLocaleString()} deploys
-                        </div>
-                      </div>
-                      <div
+                      <CartoonAvatar index={avatarIdx} size={80} />
+                      <span
                         style={{
                           fontFamily: 'var(--font-ibm-mono), monospace',
-                          fontSize: 11,
-                          fontWeight: 600,
-                          letterSpacing: '0.06em',
-                          color: '#0A0A0F',
-                          border: '2px solid #0A0A0F',
-                          padding: '4px 10px',
-                          background: 'transparent',
+                          fontSize: 9, fontWeight: 700,
+                          textTransform: 'uppercase', letterSpacing: '0.14em',
+                          color: 'rgba(10,10,15,0.55)',
                         }}
                       >
-                        View →
+                        {agent.category}
+                      </span>
+                    </div>
+
+                    {/* Body */}
+                    <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <h3
+                        style={{
+                          fontFamily: AKT,
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: '#0A0A0F',
+                          margin: 0,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {agent.name}
+                      </h3>
+                      <p
+                        style={{
+                          fontFamily: AKT,
+                          fontSize: 13,
+                          color: '#5A4A3A',
+                          lineHeight: 1.55,
+                          marginTop: 8,
+                          flex: 1,
+                          overflow: 'hidden',
+                          maxHeight: '3.1em',
+                        }}
+                      >
+                        {agent.description}
+                      </p>
+
+                      {/* Meta row */}
+                      <div
+                        style={{
+                          display: 'flex', gap: 6, flexWrap: 'wrap',
+                          marginTop: 12,
+                          fontFamily: 'var(--font-ibm-mono), monospace',
+                          fontSize: 11, color: '#8A7A6A',
+                        }}
+                      >
+                        <span>{agent.deploy_count.toLocaleString()} deploys</span>
+                        <span>·</span>
+                        <span>★ {agent.rating}</span>
+                        <span>·</span>
+                        <span>@{agent.creator_name ?? 'anon'}</span>
                       </div>
+
+                      {/* Deploy button — brutalist inside rounded card */}
+                      <button
+                        style={{
+                          marginTop: 14,
+                          fontFamily: 'var(--font-ibm-mono), monospace',
+                          fontSize: 11, fontWeight: 700,
+                          letterSpacing: '0.1em', textTransform: 'uppercase',
+                          background: '#0A0A0F', color: '#E8E0D0',
+                          border: '2px solid #0A0A0F',
+                          boxShadow: `3px 3px 0 ${headerBg}`,
+                          padding: '9px 16px',
+                          borderRadius: 0,
+                          cursor: 'pointer',
+                          width: '100%',
+                          transition: 'transform 60ms ease, box-shadow 60ms ease',
+                        }}
+                        onMouseEnter={e => {
+                          const el = e.currentTarget as HTMLButtonElement
+                          el.style.transform = 'translate(1px,1px)'
+                          el.style.boxShadow = `2px 2px 0 ${headerBg}`
+                        }}
+                        onMouseLeave={e => {
+                          const el = e.currentTarget as HTMLButtonElement
+                          el.style.transform = ''
+                          el.style.boxShadow = `3px 3px 0 ${headerBg}`
+                        }}
+                      >
+                        DEPLOY →
+                      </button>
                     </div>
                   </div>
                 </Link>

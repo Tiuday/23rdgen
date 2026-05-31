@@ -430,12 +430,6 @@ export default function Footer() {
             © 2026 23rdGen. Open marketplace for deployable intelligence.
           </span>
 
-          <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, color: '#3A3A4A', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ color: '#7C6A9E', fontStyle: 'normal' }}>♦</span>
-            Crafted by Nakshatra Sharma
-            <span style={{ color: '#7C6A9E', fontStyle: 'normal' }}>♦</span>
-          </span>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button
               onClick={() => setFounderOpen(true)}

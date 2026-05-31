@@ -18,6 +18,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import CartoonAvatar, { stableAvatarIdx } from '@/components/mascot/CartoonAvatar'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -118,37 +119,41 @@ function LibraryDraggable({ item, inCanvas }: { item: LibraryItem; inCanvas: boo
     disabled: inCanvas,
   })
   const c = TYPE_COLORS[item.type]
+  const avatarIdx = stableAvatarIdx(item.id)
   return (
     <div
       ref={setNodeRef}
       {...(inCanvas ? {} : listeners)}
       {...(inCanvas ? {} : attributes)}
       style={{
-        background: c.bg,
+        background: '#FEFBF5',
         border: '2px solid #0A0A0F',
-        boxShadow: isDragging ? 'none' : '2px 2px 0px #0A0A0F',
-        padding: '10px 12px',
+        boxShadow: isDragging ? 'none' : '2px 2px 0 #0A0A0F',
         marginBottom: 8,
+        overflow: 'hidden',
         cursor: inCanvas ? 'default' : isDragging ? 'grabbing' : 'grab',
-        opacity: isDragging ? 0.35 : inCanvas ? 0.42 : 1,
+        opacity: isDragging ? 0.35 : inCanvas ? 0.45 : 1,
         userSelect: 'none',
         touchAction: 'none',
       }}
     >
-      <span style={{
-        fontFamily: 'var(--font-ibm-mono), monospace',
-        fontSize: 9, fontWeight: 600, textTransform: 'uppercase' as const,
-        letterSpacing: '0.08em', padding: '1px 6px',
-        background: 'rgba(0,0,0,0.09)', color: c.text,
-        border: `1px solid ${c.border}`, display: 'inline-block', marginBottom: 4,
-      }}>
-        {item.type.slice(0, -1)}{inCanvas ? ' ✓' : ''}
-      </span>
-      <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, fontWeight: 600, color: '#0A0A0F', marginBottom: 2 }}>
-        {item.name}
+      <div style={{ background: c.bg, padding: '8px 10px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <CartoonAvatar index={avatarIdx} size={32} />
+        <span style={{
+          fontFamily: 'var(--font-ibm-mono), monospace',
+          fontSize: 8, fontWeight: 700, textTransform: 'uppercase' as const,
+          letterSpacing: '0.1em', color: 'rgba(10,10,15,0.5)',
+        }}>
+          {item.type.slice(0, -1)}{inCanvas ? ' ✓' : ''}
+        </span>
       </div>
-      <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 11, color: '#2A1A0E', lineHeight: 1.4 }}>
-        {item.description}
+      <div style={{ padding: '8px 10px 10px' }}>
+        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 700, color: '#0A0A0F', marginBottom: 2 }}>
+          {item.name}
+        </div>
+        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, color: '#5A4A3A', lineHeight: 1.4 }}>
+          {item.description}
+        </div>
       </div>
     </div>
   )
@@ -168,10 +173,24 @@ function CanvasSortableCard({ card, onRemove, onEl }: CanvasCardProps) {
     data: { source: 'canvas' },
   })
   const c = TYPE_COLORS[card.type]
+  const avatarIdx = stableAvatarIdx(card.id)
 
   function mergeRef(el: HTMLDivElement | null) {
     setNodeRef(el)
     onEl(el)
+  }
+
+  const PORT: React.CSSProperties = {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    background: '#F0E6D0',
+    border: '2px solid #0A0A0F',
+    boxShadow: '1px 1px 0 #0A0A0F',
+    zIndex: 2,
   }
 
   return (
@@ -187,48 +206,67 @@ function CanvasSortableCard({ card, onRemove, onEl }: CanvasCardProps) {
         zIndex: 1,
       }}
     >
+      {/* Input port — left edge */}
+      <div style={{ ...PORT, left: -6 }} title="Input" />
+      {/* Output port — right edge */}
+      <div style={{ ...PORT, right: -6 }} title="Output" />
+
       <div style={{
-        background: c.bg,
+        background: '#FEFBF5',
         border: '2px solid #0A0A0F',
-        boxShadow: '4px 4px 0px #0A0A0F',
-        padding: 16,
+        boxShadow: '4px 4px 0 #0A0A0F',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
       }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <span style={{
-            fontFamily: 'var(--font-ibm-mono), monospace',
-            fontSize: 9, fontWeight: 600, textTransform: 'uppercase' as const,
-            letterSpacing: '0.08em', padding: '1px 6px',
-            background: 'rgba(0,0,0,0.09)', color: c.text, border: `1px solid ${c.border}`,
-          }}>
-            {card.type.slice(0, -1)}
-          </span>
+        {/* Colored avatar zone */}
+        <div style={{
+          background: c.bg,
+          padding: '12px 12px 8px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 6,
+          position: 'relative',
+        }}>
           <button
             onClick={onRemove}
             style={{
+              position: 'absolute', top: 4, right: 4,
               background: '#0A0A0F', color: '#E8E0D0', border: 'none',
-              width: 18, height: 18, cursor: 'pointer',
+              width: 16, height: 16, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 14, fontWeight: 700,
-              flexShrink: 0, padding: 0, lineHeight: 1,
+              fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 700,
+              padding: 0, lineHeight: 1,
             }}
           >
             ×
           </button>
+          <CartoonAvatar index={avatarIdx} size={52} />
+          <span style={{
+            fontFamily: 'var(--font-ibm-mono), monospace',
+            fontSize: 8, fontWeight: 700, textTransform: 'uppercase' as const,
+            letterSpacing: '0.1em', color: 'rgba(10,10,15,0.5)',
+          }}>
+            {card.type.slice(0, -1)}
+          </span>
         </div>
-        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 14, fontWeight: 600, color: '#0A0A0F' }}>
-          {card.name}
+
+        {/* Body */}
+        <div style={{ padding: '10px 12px 6px' }}>
+          <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 700, color: '#0A0A0F', lineHeight: 1.3, marginBottom: 4 }}>
+            {card.name}
+          </div>
+          <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, color: '#5A4A3A', lineHeight: 1.45 }}>
+            {card.description}
+          </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 11, color: '#2A1A0E', lineHeight: 1.4 }}>
-          {card.description}
-        </div>
+
         {/* Drag handle */}
         <div
           {...listeners}
           {...attributes}
-          style={{ textAlign: 'center', color: '#A89880', fontSize: 16, cursor: 'grab', paddingTop: 4, touchAction: 'none', userSelect: 'none' }}
+          style={{ textAlign: 'center', color: '#A89880', fontSize: 14, cursor: 'grab', padding: '6px 0 8px', touchAction: 'none', userSelect: 'none', borderTop: '1px solid rgba(0,0,0,0.08)' }}
         >
           ⠿
         </div>
@@ -276,13 +314,22 @@ function CanvasDropZone({ children, hasCards }: { children: React.ReactNode; has
 
 function DragCard({ item }: { item: LibraryItem }) {
   const c = TYPE_COLORS[item.type]
+  const avatarIdx = stableAvatarIdx(item.id)
   return (
     <div style={{
-      background: c.bg, border: '2px solid #0A0A0F', boxShadow: '6px 6px 0px rgba(10,10,15,0.3)',
-      padding: '10px 12px', width: 200, cursor: 'grabbing', opacity: 0.92,
+      background: '#FEFBF5', border: '2px solid #0A0A0F', boxShadow: '6px 6px 0 rgba(10,10,15,0.3)',
+      overflow: 'hidden', width: 200, cursor: 'grabbing', opacity: 0.92,
     }}>
-      <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 13, fontWeight: 600, color: '#0A0A0F' }}>{item.name}</div>
-      <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 11, color: '#2A1A0E', marginTop: 2 }}>{item.description}</div>
+      <div style={{ background: c.bg, padding: '10px 12px 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <CartoonAvatar index={avatarIdx} size={36} />
+        <span style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 8, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.1em', color: 'rgba(10,10,15,0.5)' }}>
+          {item.type.slice(0, -1)}
+        </span>
+      </div>
+      <div style={{ padding: '8px 12px 10px' }}>
+        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 700, color: '#0A0A0F' }}>{item.name}</div>
+        <div style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 10, color: '#5A4A3A', marginTop: 2 }}>{item.description}</div>
+      </div>
     </div>
   )
 }

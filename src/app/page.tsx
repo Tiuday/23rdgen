@@ -6,9 +6,8 @@ import { Menu, X, Search, LayoutGrid, PenLine, BookOpen, Code2, Briefcase, Palet
 import { useRouter } from 'next/navigation'
 import HeroTree from '@/components/HeroTree'
 import TreeRoots from '@/components/TreeRoots'
-import PixelAvatar from '@/components/mascot/PixelAvatar'
+import CartoonAvatar, { stableAvatarIdx } from '@/components/mascot/CartoonAvatar'
 import Footer from '@/components/layout/Footer'
-import type { AgentCategory } from '@/types/agent'
 
 // ── Sidebar categories ──────────────────────────────────────────────────────
 const SIDEBAR_CATS = [
@@ -81,7 +80,7 @@ function HomepageCard({
   featured?: boolean
 }) {
   const headerBg = TYPE_COLORS[type] ?? '#F5D76E'
-  const pixelType = type as AgentCategory
+  const avatarIdx = stableAvatarIdx(card.id)
 
   return (
     <div
@@ -108,14 +107,15 @@ function HomepageCard({
         el.style.boxShadow = '4px 4px 0 #0A0A0F'
       }}
     >
-      {/* Colored header */}
+      {/* Colored header — big centered avatar */}
       <div
         style={{
           background: headerBg,
-          padding: featured ? '22px 20px 18px' : '18px 18px 14px',
+          padding: featured ? '28px 20px 20px' : '22px 18px 16px',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: 12,
+          gap: 10,
           position: 'relative',
           flexShrink: 0,
         }}
@@ -123,24 +123,24 @@ function HomepageCard({
         {featured && (
           <span
             style={{
-              position: 'absolute', top: 10, right: 12,
+              position: 'absolute', top: 10, left: 12,
               fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
               fontSize: 9, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
               background: '#0A0A0F', color: '#E8E0D0',
-              padding: '3px 8px', borderRadius: 4,
+              padding: '3px 8px', borderRadius: 0,
             }}
           >
             ★ FEATURED PICK
           </span>
         )}
-        <PixelAvatar category={pixelType} size={featured ? 50 : 42} />
+        <CartoonAvatar index={avatarIdx} size={featured ? 100 : 80} />
         <span
           style={{
             fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-            fontSize: 10, fontWeight: 600,
-            textTransform: 'uppercase', letterSpacing: '0.12em',
-            color: 'rgba(10,10,15,0.6)',
+            fontSize: 9, fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.14em',
+            color: 'rgba(10,10,15,0.55)',
           }}
         >
           {type}
