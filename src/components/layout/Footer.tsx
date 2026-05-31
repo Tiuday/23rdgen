@@ -220,7 +220,7 @@ export function FounderIDCard() {
         <div style={{ flex: 1, padding: '16px' }}>
           {(
             [
-              ['Name',    'Vrish'],
+              ['Name',    'Nakshatra Sharma'],
               ['Title',   'Co-Founder & CEO, 23rdGen'],
               ['Agency',  '23rdGen AI Agency'],
               ['Mission', 'Building the world’s first open marketplace for deployable AI intelligence'],
@@ -247,7 +247,7 @@ export function FounderIDCard() {
       {/* Signature + stamp */}
       <div style={{ borderTop: '1.5px solid rgba(10,10,15,0.15)', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontFamily: 'var(--font-dm-serif), DM Serif Display, serif', fontSize: 16, color: '#2A1A0E', fontStyle: 'italic' }}>
-          Vrish
+          Nakshatra Sharma
         </span>
         <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, color: '#7C6A9E', border: '1.5px solid #7C6A9E', padding: '3px 8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           VERIFIED BUILDER ■
@@ -321,7 +321,7 @@ export function FounderContactForm() {
           borderRadius: 0,
         }}
       >
-        {sent ? '✓ MESSAGE SENT' : 'SEND TO VRISH →'}
+        {sent ? '✓ MESSAGE SENT' : 'SEND TO NAKSHATRA →'}
       </button>
     </form>
   )

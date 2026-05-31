@@ -73,4 +73,4 @@ claude, chatgpt, gemini, n8n, other
 - Commit after every completed section
 
 ## Founder
-Vrish — direct, iterative, strong visual sense. Gives feedback session by session.
+Nakshatra Sharma — direct, iterative, strong visual sense. Gives feedback session by session.

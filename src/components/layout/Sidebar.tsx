@@ -15,6 +15,7 @@ import {
   User,
   Zap,
   Users,
+  Sparkles,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
@@ -259,6 +260,7 @@ function SidebarContent({
   }
 
   const browseActive = isActive('/browse')
+  const tiudayActive = isActive('/tiuday')
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -275,8 +277,8 @@ function SidebarContent({
           <Image
             src="/inspiration/logo.png"
             alt="23rdGen"
-            width={collapsed ? 28 : 78}
-            height={collapsed ? 28 : 22}
+            width={collapsed ? 24 : 84}
+            height={collapsed ? 24 : 24}
             style={{ objectFit: 'contain', objectPosition: 'left center' }}
             priority
           />
@@ -285,6 +287,65 @@ function SidebarContent({
 
       {/* Scrollable nav area */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px' }} className="scrollbar-none">
+        {/* Tiuday — flagship AI team builder */}
+        <div style={{ marginBottom: 6 }}>
+          <Link
+            href="/tiuday"
+            onClick={onClose}
+            title={collapsed ? 'Tiuday' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: collapsed ? 0 : 10,
+              justifyContent: collapsed ? 'center' : 'space-between',
+              padding: '9px 12px',
+              borderRadius: 12,
+              textDecoration: 'none',
+              fontFamily: AKT,
+              fontSize: 13,
+              fontWeight: 600,
+              color: tiudayActive ? '#FFFFFF' : '#A090C8',
+              background: tiudayActive ? '#1E1530' : 'rgba(124,106,158,0.1)',
+              border: tiudayActive ? '1px solid rgba(124,106,158,0.35)' : '1px solid rgba(124,106,158,0.18)',
+              boxShadow: tiudayActive ? '0 0 0 1px rgba(124,106,158,0.15) inset' : 'none',
+              transition: 'background 100ms ease, color 100ms ease',
+            }}
+            onMouseEnter={e => {
+              if (!tiudayActive) {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.background = 'rgba(124,106,158,0.18)'
+                el.style.color = '#C4B4E8'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!tiudayActive) {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.background = 'rgba(124,106,158,0.1)'
+                el.style.color = '#A090C8'
+              }
+            }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 10 }}>
+              <Sparkles size={15} />
+              {!collapsed && <span>Tiuday</span>}
+            </span>
+            {!collapsed && (
+              <span style={{
+                fontFamily: "'Akt', system-ui, sans-serif",
+                fontSize: 9,
+                color: '#7C6A9E',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                background: 'rgba(124,106,158,0.2)',
+                padding: '2px 6px',
+                borderRadius: 4,
+              }}>
+                AI TEAM
+              </span>
+            )}
+          </Link>
+        </div>
+
         {/* Browse All */}
         <div style={{ marginBottom: 4 }}>
           <NavItem

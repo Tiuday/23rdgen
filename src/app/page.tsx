@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, Search, LayoutGrid, PenLine, BookOpen, Code2, Briefcase, Palette, CheckCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { Menu, X, Search, LayoutGrid, PenLine, BookOpen, Code2, Briefcase, Palette, CheckCheck, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import HeroTree from '@/components/HeroTree'
 import TreeRoots from '@/components/TreeRoots'
@@ -31,25 +31,29 @@ interface HomeCard {
 
 const CARDS: Record<string, HomeCard[]> = {
   agent: [
-    { id: '1', name: 'Code Review Wizard',  description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.', creator: 'devtools_hq',  deploys: 2840, rating: 4.8 },
-    { id: '5', name: 'Bug Hunter Pro',       description: 'Scans code for common bug patterns, off-by-one errors, null pointer risks, and silent runtime exceptions.',         creator: 'debuggers',    deploys: 1420, rating: 4.6 },
-    { id: '9', name: 'Market Radar',         description: 'Tracks competitor moves, industry shifts, and emerging trends across markets. Weekly briefing format.',             creator: 'strategos',    deploys: 980,  rating: 4.4 },
+    { id: '1', name: 'Code Review Wizard',    description: 'Analyzes pull requests for bugs, security vulnerabilities, and SOLID violations across any language. Outputs findings with severity levels and concrete fix examples.', creator: 'devtools_hq',  deploys: 2840, rating: 4.8 },
+    { id: '5', name: 'Bug Hunter Pro',         description: 'Performs systematic root-cause analysis: reproduces the bug, traces the execution path to failure, provides a minimal targeted patch, and suggests prevention tests.',   creator: 'debuggers',    deploys: 1420, rating: 4.6 },
+    { id: '9', name: 'Market Radar',           description: 'Produces weekly intelligence briefings: top competitor moves, 3 emerging macro trends, 2 whitespace opportunities, and 2 risks — with sources cited throughout.',       creator: 'strategos',    deploys: 980,  rating: 4.4 },
   ],
   prompt: [
-    { id: '2',  name: 'SEO Scribe',          description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a simple keyword list.',          creator: 'marketers',    deploys: 1650, rating: 4.5 },
-    { id: '7',  name: 'Cold Email Machine',  description: 'Writes high-converting cold email sequences personalized to any industry, pain point, or buyer persona.',           creator: 'salescraft',   deploys: 2100, rating: 4.7 },
-    { id: '8',  name: 'LinkedIn Post Pro',   description: 'Generates viral LinkedIn posts that drive engagement: hooks, stories, carousels, and thought leadership content.',  creator: 'contentguild', deploys: 1780, rating: 4.6 },
+    { id: '2',  name: 'SEO Scribe',            description: 'Generates 1,200-word SEO articles with keyword-rich structure, FAQ section, and meta copy. Outputs the full article plus 5 ready-to-post social variants.',              creator: 'marketers',    deploys: 1650, rating: 4.5 },
+    { id: '7',  name: 'Cold Email Machine',    description: 'Writes 3-email sequences (Day 1/4/9) with A/B subject lines, personalization tokens, and no buzzwords. Optimized for reply rate, not click rate.',                       creator: 'salescraft',   deploys: 2100, rating: 4.7 },
+    { id: '8',  name: 'LinkedIn Post Pro',     description: 'Crafts scroll-stopping LinkedIn posts: a bold hook, white-space-friendly body, and a CTA. Under 1,300 characters with 3–5 hashtags and configurable tone.',               creator: 'contentguild', deploys: 1780, rating: 4.6 },
   ],
   skill: [
-    { id: '3',  name: 'SQL Craftsperson',    description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite with clear explanations.',          creator: 'dataeng',      deploys: 3200, rating: 4.9 },
-    { id: '11', name: 'Brand Voice Guide',   description: 'Analyzes your existing content and synthesizes a reusable brand voice guide with tone, vocabulary, and examples.',  creator: 'brandcraft',   deploys: 760,  rating: 4.3 },
+    { id: '3',  name: 'SQL Craftsperson',      description: 'Converts natural language into optimized SQL with inline comments, plain-English explanation, index recommendations, and a simpler alternative if one exists.',          creator: 'dataeng',      deploys: 3200, rating: 4.9 },
+    { id: '11', name: 'Brand Voice Guide',     description: 'Analyzes your content samples and outputs 4 voice pillars, a tone dial across contexts, 10 words to use vs. avoid, and 3 before/after rewrites as a quick-reference card.', creator: 'brandcraft',   deploys: 760,  rating: 4.3 },
+    { id: '13', name: 'API Error Explainer',   description: 'Decodes any API error in plain English: what happened, why it happened, the exact code change to fix it, and a validation pattern to prevent it from recurring.',          creator: 'devrel_hq',    deploys: 1190, rating: 4.7 },
   ],
   workflow: [
-    { id: '4',  name: 'Research Conductor',  description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',       creator: 'researchers',  deploys: 890,  rating: 4.3 },
-    { id: '10', name: 'Pitch Deck Writer',   description: 'Creates investor-ready pitch decks from a simple brief. Covers problem, solution, traction, and ask.',            creator: 'foundry',      deploys: 1340, rating: 4.5 },
+    { id: '4',  name: 'Research Conductor',    description: '5-step workflow: scopes the question into sub-questions, identifies authoritative sources per sub-question, extracts findings, synthesizes contradictions, and formats a cited executive report.', creator: 'researchers',  deploys: 890,  rating: 4.3 },
+    { id: '10', name: 'Pitch Deck Writer',     description: 'Builds full investor decks from a brief: problem, solution, TAM/SAM/SOM, traction metrics, business model, competition matrix, team credentials, and use-of-funds. Includes speaker notes.', creator: 'foundry',      deploys: 1340, rating: 4.5 },
+    { id: '14', name: 'Content Calendar',      description: 'Generates a 30-day multi-platform content calendar with weekly themes, post formats, hooks, body summaries, CTAs, hashtags, and time-zone-optimized posting schedules.',  creator: 'schedcraft',   deploys: 640,  rating: 4.4 },
   ],
   team: [
-    { id: '12', name: 'Content Team',        description: 'A coordinated 4-agent team: SEO writer, social scheduler, cold email specialist, and research summarizer.',         creator: '23rdgen',      deploys: 3500, rating: 4.9 },
+    { id: '12', name: 'Content Ops Team',      description: 'A 4-agent pipeline: Research Summarizer feeds the SEO Writer, who hands off to the Social Scheduler, who coordinates with the Cold Email Specialist. Full-cycle content operations.', creator: '23rdgen',      deploys: 3500, rating: 4.9 },
+    { id: '15', name: 'Startup Launch Squad',  description: 'A 5-agent launch team: Market Researcher → Pitch Deck Writer → Cold Email Machine → PR Angle Finder → Launch Post Writer. From insight to announcement in one pipeline.',       creator: 'launchpad_ai', deploys: 1280, rating: 4.7 },
+    { id: '16', name: 'Dev Squad',             description: 'A 3-agent engineering team: Code Reviewer catches bugs, SQL Craftsperson handles data queries, API Error Explainer unblocks integrations. Full-stack triage support.',              creator: 'builderx',     deploys: 870,  rating: 4.5 },
   ],
 }
 
@@ -396,6 +400,19 @@ export default function HomePage() {
 
         {/* Scrollable nav */}
         <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px' }} className="scrollbar-none">
+          {/* Tiuday — AI team builder */}
+          <div style={{ marginBottom: 6 }}>
+            <Link
+              href="/tiuday"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '9px 12px', borderRadius: 12, textDecoration: 'none', fontFamily: AKT, fontSize: 13, fontWeight: 600, color: '#A090C8', background: 'rgba(124,106,158,0.1)', border: '1px solid rgba(124,106,158,0.18)', transition: 'background 100ms, color 100ms' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'rgba(124,106,158,0.18)'; el.style.color = '#C4B4E8' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = 'rgba(124,106,158,0.1)'; el.style.color = '#A090C8' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Sparkles size={15} /><span>Tiuday</span></span>
+              <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 9, color: '#7C6A9E', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(124,106,158,0.2)', padding: '2px 6px', borderRadius: 4 }}>AI TEAM</span>
+            </Link>
+          </div>
+
           <div style={{ marginBottom: 4 }}>
             <Link
               href="/browse"
@@ -458,12 +475,12 @@ export default function HomePage() {
         {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
       </button>
 
-      {/* Floating logo — top left, always visible */}
+      {/* Floating logo — small, pinned top-left, always visible */}
       <Link
         href="/"
-        style={{ position: 'fixed', top: 18, left: 68, zIndex: 200, textDecoration: 'none', lineHeight: 0, userSelect: 'none', animation: 'heroLogoIn 0.5s ease-out both' }}
+        style={{ position: 'fixed', top: 16, left: 62, zIndex: 200, textDecoration: 'none', lineHeight: 0, userSelect: 'none', animation: 'heroLogoIn 0.5s ease-out both' }}
       >
-        <Image src="/inspiration/logo.png" alt="23rdGen" width={68} height={20} style={{ objectFit: 'contain' }} priority />
+        <Image src="/inspiration/logo.png" alt="23rdGen" width={84} height={24} style={{ objectFit: 'contain' }} priority />
       </Link>
 
       {/* Top-right auth buttons */}
@@ -541,6 +558,37 @@ export default function HomePage() {
         <div style={{ position: 'relative', zIndex: 5 }}>
           {/* Thin top shadow so sections don't hard-cut the hero */}
           <div style={{ height: 1, background: 'rgba(10,10,15,0.1)' }} />
+
+          {/* Subtle root tendrils growing through the scroll content */}
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+            <svg
+              viewBox="0 0 1440 3200"
+              preserveAspectRatio="xMaxYMin meet"
+              style={{ position: 'absolute', top: 0, right: 0, width: '90%', height: '100%', opacity: 0.07 }}
+            >
+              <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+                {/* Main descending root — from hero tree base down through all sections */}
+                <path d="M 1380 0 C 1360 180 1300 380 1220 580 C 1140 780 1040 960 980 1160 C 920 1360 910 1560 940 1760 C 970 1960 1010 2160 990 2380 C 970 2600 930 2800 900 3200" stroke="#2A1A0E" strokeWidth="10"/>
+                {/* Secondary root — branches left */}
+                <path d="M 1340 0 C 1300 220 1220 440 1120 660 C 1020 880 900 1060 820 1260 C 740 1460 720 1660 760 1860 C 800 2060 840 2260 820 2500 C 800 2740 760 2960 720 3200" stroke="#2A1A0E" strokeWidth="6"/>
+                {/* Thin tendril — goes far left */}
+                <path d="M 1290 0 C 1230 300 1140 580 1020 840 C 900 1100 760 1320 680 1560 C 600 1800 600 2040 640 2280 C 680 2520 700 2760 680 3200" stroke="#2A1A0E" strokeWidth="3.5"/>
+                {/* Tertiary root — mid-right sweep */}
+                <path d="M 1420 200 C 1400 420 1360 640 1300 860 C 1240 1080 1160 1280 1120 1500 C 1080 1720 1100 1940 1080 2160 C 1060 2380 1020 2600 1000 3200" stroke="#2A1A0E" strokeWidth="5"/>
+                {/* Fine right-side tendril */}
+                <path d="M 1440 400 C 1430 620 1410 840 1390 1060 C 1370 1280 1350 1500 1340 1720 C 1330 1940 1340 2160 1320 2400 C 1300 2640 1280 2880 1260 3200" stroke="#2A1A0E" strokeWidth="2"/>
+                {/* Cross-branch at ~800px */}
+                <path d="M 1200 820 C 1120 860 1020 880 900 900 C 780 920 660 930 540 940" stroke="#2A1A0E" strokeWidth="2.5"/>
+                {/* Cross-branch at ~1600px */}
+                <path d="M 1080 1600 C 980 1640 860 1660 740 1670 C 620 1680 500 1690 380 1700" stroke="#2A1A0E" strokeWidth="2"/>
+                {/* Cross-branch at ~2400px */}
+                <path d="M 920 2360 C 820 2390 700 2410 580 2420 C 460 2430 340 2440 200 2450" stroke="#2A1A0E" strokeWidth="1.5"/>
+                {/* Fine capillary left */}
+                <path d="M 1140 1100 C 1060 1120 960 1140 840 1150" stroke="#2A1A0E" strokeWidth="1.2"/>
+                <path d="M 960 1900 C 880 1920 780 1940 660 1950" stroke="#2A1A0E" strokeWidth="1"/>
+              </g>
+            </svg>
+          </div>
 
           {['agent', 'prompt', 'skill', 'workflow', 'team'].map(type => (
             <ContentSection key={type} type={type} />
