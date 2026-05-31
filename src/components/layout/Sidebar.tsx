@@ -96,6 +96,26 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
       }}
       className="scrollbar-none"
     >
+      {/* Wordmark */}
+      <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.08)', flexShrink: 0 }}>
+        <Link
+          href="/"
+          onClick={onClose}
+          style={{
+            fontFamily: 'var(--font-dm-serif), "DM Serif Display", Georgia, serif',
+            fontStyle: 'italic',
+            fontSize: 18,
+            color: '#0A0A0F',
+            textDecoration: 'none',
+            letterSpacing: '-0.01em',
+            lineHeight: 1,
+            display: 'block',
+          }}
+        >
+          23rdGen
+        </Link>
+      </div>
+
       {/* Browse All */}
       <div style={{ padding: '10px 0 6px' }}>
         <Link
@@ -214,7 +234,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       {/* Desktop: always visible */}
       <aside
         className="hidden md:block fixed left-0 bottom-0 z-50"
-        style={{ top: 48, width: 220 }}
+        style={{ top: 0, width: 220 }}
       >
         <Suspense fallback={null}>
           <SidebarContent onClose={() => {}} />

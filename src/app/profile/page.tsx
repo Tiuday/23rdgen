@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 
 type Tab = 'agents' | 'saved' | 'activity' | 'teams'
 
@@ -281,12 +282,12 @@ export default function ProfilePage() {
               </button>
             </div>
           ))}
-          <a
+          <Link
             href="/teams"
             style={{ fontFamily: 'var(--font-ibm-mono), monospace', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', background: '#0A0A0F', color: '#E8E0D0', border: '2px solid #0A0A0F', boxShadow: '3px 3px 0px rgba(10,10,15,0.3)', padding: '10px 0', cursor: 'pointer', width: '100%', marginTop: 4, textAlign: 'center', textDecoration: 'none', display: 'block' }}
           >
             + Build New Team
-          </a>
+          </Link>
         </div>
       )}
     </div>
