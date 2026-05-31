@@ -1,11 +1,10 @@
 'use client'
 
 type LeafVariant = 'a' | 'b' | 'c' | 'd'
-type SwayAnim = 'sway-a' | 'sway-b' | 'sway-c'
 
 interface LeafData {
   x: number; y: number; rot: number; variant: LeafVariant
-  w: number; h: number; anim: SwayAnim; dur: number; delay: number; op: number
+  w: number; h: number; dur: number; delay: number; op: number
 }
 
 const BASE_DOTS: { x: number; y: number }[] = [
@@ -44,7 +43,7 @@ const BASE_DOTS: { x: number; y: number }[] = [
   { x: 105, y: 22  }, { x: 125, y: 68  }, { x: 142, y: 118 }, { x: 158, y: 48  }, { x: 178, y: 138 },
   { x: 422, y: 22  }, { x: 438, y: 68  }, { x: 455, y: 118 }, { x: 468, y: 48  }, { x: 485, y: 138 },
   { x: 240, y: 22  }, { x: 255, y: 62  }, { x: 272, y: 105 }, { x: 310, y: 68  }, { x: 325, y: 25  },
-  // Additional tips for density (180-220 total)
+  // Additional tips for density
   { x: -4,  y: 186 }, { x: 2,   y: 122 }, { x: -10, y: 62  }, { x: -20, y: 28  }, { x: -8,  y: 8   },
   { x: 580, y: 182 }, { x: 576, y: 120 }, { x: 582, y: 72  }, { x: 574, y: 20  }, { x: 570, y: -5  },
   { x: 212, y: 4   }, { x: 220, y: -14 }, { x: 225, y: -22 }, { x: 328, y: -20 }, { x: 334, y: -2  },
@@ -56,55 +55,61 @@ const BASE_DOTS: { x: number; y: number }[] = [
   { x: 360, y: 115 }, { x: 376, y: 55  }, { x: 348, y: 90  }, { x: 202, y: 100 }, { x: 218, y: 50  },
 ]
 
-const LEAVES: LeafData[] = BASE_DOTS.map((dot, i) => {
-  const variants: LeafVariant[] = ['a', 'b', 'c', 'd']
-  const anims: SwayAnim[] = ['sway-a', 'sway-b', 'sway-c']
-  return {
-    x: dot.x,
-    y: dot.y,
-    rot: (i * 37 % 120) - 60,
-    variant: variants[i % 4],
-    w: 10 + (i * 3 % 7),
-    h: 15 + (i * 5 % 9),
-    anim: anims[i % 3],
-    dur: 2.8 + (i * 7 % 27) * 0.1,
-    delay: (i * 11 % 40) * 0.1,
-    op: 0.6 + (i % 5) * 0.08,
-  }
-})
+const variants: LeafVariant[] = ['a', 'b', 'c', 'd']
+
+const LEAVES: LeafData[] = BASE_DOTS.map((dot, i) => ({
+  x: dot.x,
+  y: dot.y,
+  rot: (i * 37 % 120) - 60,
+  variant: variants[i % 4],
+  w: 10 + (i * 3 % 7),
+  h: 15 + (i * 5 % 9),
+  dur: 2.5 + (i * 7 % 25) * 0.1,
+  delay: (i * 11 % 40) * 0.1,
+  op: 0.6 + (i % 5) * 0.08,
+}))
 
 export default function HeroTree() {
   return (
-    <div style={{
-      position: 'absolute',
-      right: '-8vw',
-      bottom: 0,
-      height: '105vh',
-      width: '65vw',
-      pointerEvents: 'none',
-      zIndex: 1,
-    }}>
+    <div style={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
       <style>{`
-        @keyframes sway-a {
-          0%,100% { transform: rotate(var(--r)) translateY(0px); }
-          33% { transform: rotate(calc(var(--r) + 9deg)) translateY(-3px); }
-          66% { transform: rotate(calc(var(--r) - 7deg)) translateY(2px); }
+        @keyframes trunkSway {
+          0%, 100% { transform: rotate(0deg); }
+          25%       { transform: rotate(0.4deg); }
+          75%       { transform: rotate(-0.3deg); }
         }
-        @keyframes sway-b {
-          0%,100% { transform: rotate(var(--r)) translateY(0px); }
-          40% { transform: rotate(calc(var(--r) - 10deg)) translateY(-4px); }
-          70% { transform: rotate(calc(var(--r) + 6deg)) translateY(1px); }
+        @keyframes branchSway1 {
+          0%, 100% { transform: rotate(0deg); }
+          33%      { transform: rotate(1.2deg); }
+          66%      { transform: rotate(-0.8deg); }
         }
-        @keyframes sway-c {
-          0%,100% { transform: rotate(var(--r)) scale(1); }
-          50% { transform: rotate(calc(var(--r) + 5deg)) scale(1.06) translateY(-2px); }
+        @keyframes branchSway2 {
+          0%, 100% { transform: rotate(0deg); }
+          40%      { transform: rotate(-1.5deg); }
+          70%      { transform: rotate(0.9deg); }
+        }
+        @keyframes branchSway3 {
+          0%, 100% { transform: rotate(0deg); }
+          30%      { transform: rotate(0.7deg); }
+          80%      { transform: rotate(-1.1deg); }
         }
         @keyframes branch-sway {
-          0%,100% { transform: rotate(0deg); }
-          35% { transform: rotate(0.8deg); }
-          70% { transform: rotate(-0.6deg); }
+          0%, 100% { transform: rotate(0deg); }
+          35%      { transform: rotate(0.5deg); }
+          70%      { transform: rotate(-0.4deg); }
+        }
+        @keyframes leafDance {
+          0%, 100% { transform: rotate(var(--r)) translateY(0px) scale(1); }
+          20%      { transform: rotate(calc(var(--r) + 10deg)) translateY(-4px) scale(1.04); }
+          50%      { transform: rotate(calc(var(--r) - 7deg)) translateY(-6px) scale(1.02); }
+          80%      { transform: rotate(calc(var(--r) + 5deg)) translateY(-2px) scale(1.06); }
+        }
+        @keyframes leafShimmer {
+          0%, 100% { opacity: var(--base-op, 0.7); }
+          50%      { opacity: 1; }
         }
       `}</style>
+
       <svg
         viewBox="0 0 580 920"
         width="100%"
@@ -129,53 +134,64 @@ export default function HeroTree() {
           </symbol>
         </defs>
 
-        {/* Branch sway group */}
+        {/* Outer gentle sway — whole canopy */}
         <g style={{ animation: 'branch-sway 5s ease-in-out infinite', transformOrigin: '290px 920px' }}>
 
-          {/* ── Trunk — organic fill with root flares ── */}
-          <path
-            d="M 150 920
-               C 163 912 182 907 202 908
-               C 218 909 228 914 232 920
-               C 235 904 237 878 239 852
-               C 241 820 243 787 245 750
-               C 246 713 247 675 248 638
-               C 249 601 251 562 254 524
-               C 257 486 261 448 266 413
-               C 270 380 275 350 280 330
-               C 284 318 288 313 294 311
-               L 300 311
-               C 306 313 310 318 314 330
-               C 319 350 324 380 328 413
-               C 333 448 337 486 340 524
-               C 343 562 345 601 346 638
-               C 347 675 348 713 349 750
-               C 351 787 353 820 355 852
-               C 357 878 359 904 362 920
-               C 366 914 376 909 392 908
-               C 412 907 430 912 442 920 Z"
-            fill="#0A0A0F" stroke="none"
-          />
+          {/* Trunk + bark — own sway around base */}
+          <g style={{ animation: 'trunkSway 6s ease-in-out infinite', transformOrigin: '291px 920px' }}>
+            <path
+              d="M 150 920
+                 C 163 912 182 907 202 908
+                 C 218 909 228 914 232 920
+                 C 235 904 237 878 239 852
+                 C 241 820 243 787 245 750
+                 C 246 713 247 675 248 638
+                 C 249 601 251 562 254 524
+                 C 257 486 261 448 266 413
+                 C 270 380 275 350 280 330
+                 C 284 318 288 313 294 311
+                 L 300 311
+                 C 306 313 310 318 314 330
+                 C 319 350 324 380 328 413
+                 C 333 448 337 486 340 524
+                 C 343 562 345 601 346 638
+                 C 347 675 348 713 349 750
+                 C 351 787 353 820 355 852
+                 C 357 878 359 904 362 920
+                 C 366 914 376 909 392 908
+                 C 412 907 430 912 442 920 Z"
+              fill="#0A0A0F" stroke="none"
+            />
+            {/* Bark texture */}
+            <path d="M 285 326 C 283 392 281 458 282 524 C 283 590 282 656 281 722 C 280 782 281 842 282 898" stroke="#2A1A0E" strokeWidth="1.5" fill="none" opacity="0.30" strokeLinecap="round"/>
+            <path d="M 297 326 C 299 392 301 458 300 524 C 299 590 300 656 301 722 C 302 782 301 842 300 898" stroke="#2A1A0E" strokeWidth="1.5" fill="none" opacity="0.30" strokeLinecap="round"/>
+            <path d="M 279 342 C 277 408 276 474 277 540 C 278 606 277 672 276 738 C 275 798 276 852 277 898" stroke="#2A1A0E" strokeWidth="1.2" fill="none" opacity="0.22" strokeLinecap="round"/>
+            <path d="M 303 342 C 305 408 306 474 305 540 C 304 606 305 672 306 738 C 307 798 306 852 305 898" stroke="#2A1A0E" strokeWidth="1.2" fill="none" opacity="0.22" strokeLinecap="round"/>
+            <path d="M 274 360 C 271 426 270 492 272 558 C 274 624 273 690 271 756 C 269 816 271 866 272 912" stroke="#2A1A0E" strokeWidth="1" fill="none" opacity="0.18" strokeLinecap="round"/>
+            <path d="M 308 360 C 311 426 312 492 310 558 C 308 624 309 690 311 756 C 313 816 311 866 310 912" stroke="#2A1A0E" strokeWidth="1" fill="none" opacity="0.18" strokeLinecap="round"/>
+            <path d="M 269 644 C 267 696 268 748 271 800 C 273 844 272 878 273 912" stroke="#2A1A0E" strokeWidth="0.8" fill="none" opacity="0.12" strokeLinecap="round"/>
+            <path d="M 313 644 C 315 696 314 748 311 800 C 309 844 310 878 309 912" stroke="#2A1A0E" strokeWidth="0.8" fill="none" opacity="0.12" strokeLinecap="round"/>
+          </g>
 
-          {/* Bark texture strokes */}
-          <path d="M 285 326 C 283 392 281 458 282 524 C 283 590 282 656 281 722 C 280 782 281 842 282 898" stroke="#2A1A0E" strokeWidth="1.5" fill="none" opacity="0.30" strokeLinecap="round"/>
-          <path d="M 297 326 C 299 392 301 458 300 524 C 299 590 300 656 301 722 C 302 782 301 842 300 898" stroke="#2A1A0E" strokeWidth="1.5" fill="none" opacity="0.30" strokeLinecap="round"/>
-          <path d="M 279 342 C 277 408 276 474 277 540 C 278 606 277 672 276 738 C 275 798 276 852 277 898" stroke="#2A1A0E" strokeWidth="1.2" fill="none" opacity="0.22" strokeLinecap="round"/>
-          <path d="M 303 342 C 305 408 306 474 305 540 C 304 606 305 672 306 738 C 307 798 306 852 305 898" stroke="#2A1A0E" strokeWidth="1.2" fill="none" opacity="0.22" strokeLinecap="round"/>
-          <path d="M 274 360 C 271 426 270 492 272 558 C 274 624 273 690 271 756 C 269 816 271 866 272 912" stroke="#2A1A0E" strokeWidth="1" fill="none" opacity="0.18" strokeLinecap="round"/>
-          <path d="M 308 360 C 311 426 312 492 310 558 C 308 624 309 690 311 756 C 313 816 311 866 310 912" stroke="#2A1A0E" strokeWidth="1" fill="none" opacity="0.18" strokeLinecap="round"/>
-          <path d="M 269 644 C 267 696 268 748 271 800 C 273 844 272 878 273 912" stroke="#2A1A0E" strokeWidth="0.8" fill="none" opacity="0.12" strokeLinecap="round"/>
-          <path d="M 313 644 C 315 696 314 748 311 800 C 309 844 310 878 309 912" stroke="#2A1A0E" strokeWidth="0.8" fill="none" opacity="0.12" strokeLinecap="round"/>
+          {/* Primary branches — lower pair (left + right), branchSway1 */}
+          <g style={{ animation: 'branchSway1 5.5s ease-in-out infinite', animationDelay: '0.3s', transformOrigin: '290px 516px' }}>
+            <path d="M 248 524 C 188 476 110 402 44 316 C 13 268 3 244 4 220" stroke="#0A0A0F" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 334 510 C 394 464 466 392 533 310 C 562 264 574 240 575 218" stroke="#0A0A0F" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </g>
 
-          {/* Primary branches */}
-          <path d="M 248 524 C 188 476 110 402 44 316 C 13 268 3 244 4 220" stroke="#0A0A0F" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 334 510 C 394 464 466 392 533 310 C 562 264 574 240 575 218" stroke="#0A0A0F" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 252 444 C 192 394 120 318 58 230 C 26 184 10 152 8 112" stroke="#0A0A0F" strokeWidth="14" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 330 430 C 390 380 460 304 520 220 C 550 177 567 144 570 107" stroke="#0A0A0F" strokeWidth="14" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 260 380 C 198 326 120 242 48 152 C 14 104 -10 68 -20 30" stroke="#0A0A0F" strokeWidth="11" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 322 366 C 380 310 452 228 520 144 C 554 100 574 67 578 30" stroke="#0A0A0F" strokeWidth="11" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 277 340 C 260 296 240 244 226 180 C 215 124 215 80 220 40" stroke="#0A0A0F" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M 305 330 C 319 287 330 234 334 170 C 338 114 334 70 329 30" stroke="#0A0A0F" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* Primary branches — mid pair + upper pair, branchSway2 */}
+          <g style={{ animation: 'branchSway2 6.2s ease-in-out infinite', animationDelay: '0.8s', transformOrigin: '290px 420px' }}>
+            <path d="M 252 444 C 192 394 120 318 58 230 C 26 184 10 152 8 112" stroke="#0A0A0F" strokeWidth="14" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 330 430 C 390 380 460 304 520 220 C 550 177 567 144 570 107" stroke="#0A0A0F" strokeWidth="14" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 260 380 C 198 326 120 242 48 152 C 14 104 -10 68 -20 30" stroke="#0A0A0F" strokeWidth="11" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 322 366 C 380 310 452 228 520 144 C 554 100 574 67 578 30" stroke="#0A0A0F" strokeWidth="11" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </g>
+
+          {/* Primary branches — near-vertical pair, branchSway3 */}
+          <g style={{ animation: 'branchSway3 4.8s ease-in-out infinite', animationDelay: '1.5s', transformOrigin: '291px 335px' }}>
+            <path d="M 277 340 C 260 296 240 244 226 180 C 215 124 215 80 220 40" stroke="#0A0A0F" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 305 330 C 319 287 330 234 334 170 C 338 114 334 70 329 30" stroke="#0A0A0F" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </g>
 
           {/* Secondary branches */}
           <path d="M 118 406 C 78 352 40 290 12 216" stroke="#0A0A0F" strokeWidth="8" fill="none" strokeLinecap="round"/>
@@ -201,56 +217,66 @@ export default function HeroTree() {
           <path d="M 330 190 C 316 147 312 106 316 67" stroke="#0A0A0F" strokeWidth="5" fill="none" strokeLinecap="round"/>
           <path d="M 330 190 C 343 147 348 106 341 67" stroke="#0A0A0F" strokeWidth="4" fill="none" strokeLinecap="round"/>
 
-          {/* Tertiary twigs */}
-          <path d="M 4 220 C -4 186 -6 152 2 122" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 4 220 C 18 188 24 156 18 126" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 18 174 C 8 140 6 108 12 80" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 18 174 C 30 142 34 110 28 82" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 575 218 C 580 182 578 150 572 120" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 575 218 C 565 184 562 154 568 124" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 555 170 C 562 134 564 102 558 74" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 555 170 C 544 136 540 104 548 76" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 8 112 C 0 78 -2 48 5 22" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 8 112 C 22 80 28 52 22 26" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 36 86 C 25 56 22 28 28 8" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 36 86 C 46 56 50 28 44 8" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 570 107 C 576 74 574 44 568 20" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 570 107 C 560 74 556 46 562 20" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 536 87 C 542 56 544 28 537 6" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 536 87 C 526 56 522 28 530 6" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M -20 30 C -26 10 -24 -8 -16 -22" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M -20 30 C -9  10 -6  -8 -13 -22" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 20 64 C 10 38 8 14 15 -4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 20 64 C 32 38 36 14 28 -4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 15 26 C 8 6 10 -10 18 -24" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 155 70 C 142 42 138 16 145 -4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 155 70 C 166 42 170 16 163 -4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 578 30 C 582 12 580 -6 573 -18" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 578 30 C 568 12 566 -6 574 -18" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 546 56 C 552 30 554 7 547 -12" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 560 27 C 564 7 562 -10 556 -24" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 430 60 C 416 32 412 7 420 -12" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 430 60 C 442 32 446 7 438 -12" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 212 86 C 202 54 200 26 208 4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 212 86 C 224 54 228 26 220 4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 252 86 C 242 54 240 26 248 4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 252 86 C 262 54 266 26 258 4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 220 40 C 213 18 216 -2 225 -14" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 316 67 C 308 40 309 16 317 -2" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 316 67 C 325 40 328 16 321 -2" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 341 67 C 333 40 334 16 343 -2" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 341 67 C 350 40 354 16 347 -2" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 329 30 C 322 10 325 -8 334 -20" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 158 252 C 148 220 144 187 148 158" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 158 252 C 168 220 172 187 166 158" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 422 250 C 408 217 404 185 408 155" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M 422 250 C 434 217 438 185 432 155" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 178 167 C 165 134 161 102 166 72" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 178 167 C 190 134 194 102 188 72" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
-          <path d="M 406 160 C 393 127 389 95 395 65" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M 406 160 C 418 127 422 95 416 65" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+          {/* Tertiary twigs — faster sway group A */}
+          <g style={{ animation: 'branchSway2 2.6s ease-in-out infinite', animationDelay: '0.5s', transformOrigin: '100px 200px' }}>
+            <path d="M 4 220 C -4 186 -6 152 2 122" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 4 220 C 18 188 24 156 18 126" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 18 174 C 8 140 6 108 12 80" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 18 174 C 30 142 34 110 28 82" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 8 112 C 0 78 -2 48 5 22" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 8 112 C 22 80 28 52 22 26" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 36 86 C 25 56 22 28 28 8" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 36 86 C 46 56 50 28 44 8" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M -20 30 C -26 10 -24 -8 -16 -22" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M -20 30 C -9  10 -6  -8 -13 -22" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 20 64 C 10 38 8 14 15 -4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 20 64 C 32 38 36 14 28 -4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 15 26 C 8 6 10 -10 18 -24" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 155 70 C 142 42 138 16 145 -4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 155 70 C 166 42 170 16 163 -4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 158 252 C 148 220 144 187 148 158" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 158 252 C 168 220 172 187 166 158" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 178 167 C 165 134 161 102 166 72" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 178 167 C 190 134 194 102 188 72" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+          </g>
 
-          {/* Real leaf shapes */}
+          {/* Tertiary twigs — faster sway group B */}
+          <g style={{ animation: 'branchSway3 2.9s ease-in-out infinite', animationDelay: '1.1s', transformOrigin: '470px 200px' }}>
+            <path d="M 575 218 C 580 182 578 150 572 120" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 575 218 C 565 184 562 154 568 124" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 555 170 C 562 134 564 102 558 74" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 555 170 C 544 136 540 104 548 76" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 570 107 C 576 74 574 44 568 20" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 570 107 C 560 74 556 46 562 20" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 536 87 C 542 56 544 28 537 6" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 536 87 C 526 56 522 28 530 6" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 578 30 C 582 12 580 -6 573 -18" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 578 30 C 568 12 566 -6 574 -18" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 546 56 C 552 30 554 7 547 -12" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 560 27 C 564 7 562 -10 556 -24" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 430 60 C 416 32 412 7 420 -12" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 430 60 C 442 32 446 7 438 -12" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 422 250 C 408 217 404 185 408 155" stroke="#0A0A0F" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M 422 250 C 434 217 438 185 432 155" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 406 160 C 393 127 389 95 395 65" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 406 160 C 418 127 422 95 416 65" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+          </g>
+
+          {/* Tertiary twigs — near-vertical group C */}
+          <g style={{ animation: 'branchSway1 3.2s ease-in-out infinite', animationDelay: '0.9s', transformOrigin: '285px 100px' }}>
+            <path d="M 212 86 C 202 54 200 26 208 4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 212 86 C 224 54 228 26 220 4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 252 86 C 242 54 240 26 248 4" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 252 86 C 262 54 266 26 258 4" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 220 40 C 213 18 216 -2 225 -14" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 316 67 C 308 40 309 16 317 -2" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 316 67 C 325 40 328 16 321 -2" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 341 67 C 333 40 334 16 343 -2" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M 341 67 C 350 40 354 16 347 -2" stroke="#0A0A0F" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            <path d="M 329 30 C 322 10 325 -8 334 -20" stroke="#0A0A0F" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+          </g>
+
+          {/* Leaves — leafDance + leafShimmer per leaf */}
           {LEAVES.map((leaf, i) => (
             <g key={i} transform={`translate(${leaf.x}, ${leaf.y})`}>
               <use
@@ -261,8 +287,9 @@ export default function HeroTree() {
                 height={leaf.h}
                 style={{
                   ['--r' as string]: `${leaf.rot}deg`,
+                  ['--base-op' as string]: `${leaf.op}`,
                   opacity: leaf.op,
-                  animation: `${leaf.anim} ${leaf.dur}s ${leaf.delay}s ease-in-out infinite`,
+                  animation: `leafDance ${leaf.dur}s ${leaf.delay}s ease-in-out infinite, leafShimmer ${2.5 + (i * 13 % 30) * 0.1}s ${(i * 17 % 40) * 0.1}s ease-in-out infinite`,
                   transformOrigin: `${leaf.w / 2}px ${leaf.h}px`,
                 } as React.CSSProperties}
               />
