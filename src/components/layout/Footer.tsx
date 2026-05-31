@@ -4,38 +4,38 @@ import Link from 'next/link'
 
 const FOOTER_COLS: Record<string, [string, string][]> = {
   PRODUCT: [
-    ['Agents', '/browse?type=agent'],
-    ['Prompts', '/browse?type=prompt'],
-    ['Skills', '/browse?type=skill'],
+    ['Agents',    '/browse?type=agent'],
+    ['Prompts',   '/browse?type=prompt'],
+    ['Skills',    '/browse?type=skill'],
     ['Workflows', '/browse?type=workflow'],
-    ['Teams', '/browse?type=team'],
+    ['Teams',     '/browse?type=team'],
   ],
   EXPLORE: [
-    ['Hot Shots', '/browse'],
-    ['Cult Classics', '/browse'],
-    ['Fresh Drops', '/browse'],
-    ['Under the Radar', '/browse'],
-    ['One-Click', '/browse'],
+    ['Hot Shots',        '/browse'],
+    ['Cult Classics',    '/browse'],
+    ['Fresh Drops',      '/browse'],
+    ['Under the Radar',  '/browse'],
+    ['One-Click',        '/browse'],
   ],
   RESOURCES: [
-    ['Blog', '#'],
-    ['Changelog', '#'],
-    ['Guides', '#'],
-    ['Community', '#'],
-    ['Newsletter', '#'],
+    ['Blog',        '#'],
+    ['Changelog',   '#'],
+    ['Guides',      '#'],
+    ['Community',   '#'],
+    ['Newsletter',  '#'],
   ],
   DEVELOPERS: [
     ['API Docs', '#'],
-    ['SDK', '#'],
-    ['Status', '#'],
-    ['Discord', '#'],
-    ['GitHub', '#'],
+    ['SDK',      '#'],
+    ['Status',   '#'],
+    ['Discord',  '#'],
+    ['GitHub',   '#'],
   ],
   COMPANY: [
-    ['About', '#'],
-    ['Careers', '#'],
+    ['About',    '#'],
+    ['Careers',  '#'],
     ['Partners', '#'],
-    ['Contact', '#'],
+    ['Contact',  '#'],
   ],
 }
 
@@ -94,8 +94,8 @@ function SocialIcon({ href, label, children }: { href: string; label: string; ch
 function WizardPixel() {
   return (
     <svg
-      width="120"
-      height="161"
+      width="100"
+      height="134"
       viewBox="0 0 50 67"
       fill="none"
       style={{ imageRendering: 'pixelated', display: 'block' }}
@@ -173,20 +173,96 @@ function BarcodeStripes() {
   )
 }
 
-function FounderModal({ onClose }: { onClose: () => void }) {
+// Standalone ID card — used both in modal and inline in footer
+export function FounderIDCard() {
+  return (
+    <div
+      style={{
+        background: '#F0E6D0',
+        border: '3px solid #0A0A0F',
+        boxShadow: '6px 6px 0px #7C6A9E',
+        borderRadius: 0,
+        overflow: 'hidden',
+        position: 'relative',
+        maxWidth: 420,
+      }}
+    >
+      {/* Scanline overlay */}
+      <div
+        style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10,
+          background: 'repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)',
+        }}
+      />
+      {/* Top bar */}
+      <div style={{ background: '#2A0A0A', padding: '8px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 12, color: '#E8E0D0', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          23RDGEN // FOUNDER IDENTIFICATION
+        </span>
+      </div>
+      {/* Issued line */}
+      <div style={{ background: 'rgba(42,10,10,0.08)', padding: '5px 16px', borderBottom: '1px solid rgba(10,10,15,0.15)' }}>
+        <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, color: '#5A4A3A', letterSpacing: '0.08em' }}>
+          Issued: 2026 · Active: Ongoing
+        </span>
+      </div>
+      {/* Two-column body */}
+      <div style={{ display: 'flex', gap: 0 }}>
+        {/* Left — avatar + barcode */}
+        <div style={{ width: 130, flexShrink: 0, borderRight: '1.5px solid rgba(10,10,15,0.15)', padding: '16px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, background: 'rgba(124,106,158,0.06)' }}>
+          <WizardPixel />
+          <BarcodeStripes />
+          <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 9, color: '#5A4A3A', letterSpacing: '0.12em', textAlign: 'center' }}>
+            23RDGEN-001
+          </span>
+        </div>
+        {/* Right — details */}
+        <div style={{ flex: 1, padding: '16px' }}>
+          {(
+            [
+              ['Name',    'Vrish'],
+              ['Title',   'Co-Founder & CEO, 23rdGen'],
+              ['Agency',  '23rdGen AI Agency'],
+              ['Mission', 'Building the world’s first open marketplace for deployable AI intelligence'],
+              ['Vision',  'A future where anyone can build, share and earn from AI agents — the builder class economy'],
+            ] as [string, string][]
+          ).map(([label, value]) => (
+            <div key={label} style={{ marginBottom: 10 }}>
+              <div style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 9, color: '#7C6A9E', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 2 }}>
+                {label}
+              </div>
+              <div style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 11, color: '#0A0A0F', lineHeight: 1.45 }}>
+                {value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Quote */}
+      <div style={{ borderTop: '1.5px solid rgba(10,10,15,0.15)', padding: '12px 16px', background: 'rgba(124,106,158,0.05)' }}>
+        <p style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 11, color: '#2A1A0E', lineHeight: 1.65, margin: 0 }}>
+          &ldquo;23rdGen was built for the builder generation. We believe AI intelligence should be open, deployable, and rewarded. Every agent uploaded is a step toward a world where human creativity scales infinitely through AI.&rdquo;
+        </p>
+      </div>
+      {/* Signature + stamp */}
+      <div style={{ borderTop: '1.5px solid rgba(10,10,15,0.15)', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontFamily: 'var(--font-dm-serif), DM Serif Display, serif', fontSize: 16, color: '#2A1A0E', fontStyle: 'italic' }}>
+          Vrish
+        </span>
+        <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, color: '#7C6A9E', border: '1.5px solid #7C6A9E', padding: '3px 8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          VERIFIED BUILDER ■
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// Standalone contact form — used both in modal and inline in footer
+export function FounderContactForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const subject = encodeURIComponent('Message from 23rdGen — ' + name)
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nWhat I'm building:\n${message}`)
-    window.open(`mailto:nakshatrasharma669@gmail.com?subject=${subject}&body=${body}`, '_blank')
-    setSent(true)
-    setTimeout(() => setSent(false), 3000)
-  }
 
   const inputStyle: React.CSSProperties = {
     fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
@@ -201,292 +277,67 @@ function FounderModal({ onClose }: { onClose: () => void }) {
     boxSizing: 'border-box',
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const subject = encodeURIComponent('Message from 23rdGen — ' + name)
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nWhat I'm building:\n${message}`)
+    window.open(`mailto:nakshatrasharma669@gmail.com?subject=${subject}&body=${body}`, '_blank')
+    setSent(true)
+    setTimeout(() => setSent(false), 3000)
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+    >
+      <div style={{ display: 'flex', gap: 10 }}>
+        <input required placeholder="Your Name" value={name} onChange={e => setName(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
+        <input required type="email" placeholder="Your Email" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
+      </div>
+      <textarea
+        required
+        placeholder="What are you building?"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        rows={4}
+        style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
+      />
+      <button
+        type="submit"
+        style={{
+          fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
+          fontSize: 11,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          fontWeight: 600,
+          background: sent ? '#2A5A2A' : '#0A0A0F',
+          color: sent ? '#A8D8A8' : '#E8E0D0',
+          border: '2px solid #0A0A0F',
+          boxShadow: '3px 3px 0px rgba(10,10,15,0.4)',
+          padding: '10px 0',
+          cursor: 'pointer',
+          transition: 'background 300ms, color 300ms',
+          borderRadius: 0,
+        }}
+      >
+        {sent ? '✓ MESSAGE SENT' : 'SEND TO VRISH →'}
+      </button>
+    </form>
+  )
+}
+
+function FounderModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(10,10,15,0.85)',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px 16px',
-        overflowY: 'auto',
-      }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(10,10,15,0.85)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', overflowY: 'auto' }}
     >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: 420,
-          maxWidth: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 20,
-        }}
-      >
-        {/* ── ID Card ── */}
-        <div
-          style={{
-            background: '#F0E6D0',
-            border: '3px solid #0A0A0F',
-            boxShadow: '6px 6px 0px #7C6A9E',
-            borderRadius: 0,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          {/* Scanline overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)',
-              pointerEvents: 'none',
-              zIndex: 10,
-            }}
-          />
-
-          {/* Top bar */}
-          <div
-            style={{
-              background: '#2A0A0A',
-              padding: '8px 16px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 12,
-                color: '#E8E0D0',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-              }}
-            >
-              23RDGEN // FOUNDER IDENTIFICATION
-            </span>
-          </div>
-
-          {/* Issued line */}
-          <div
-            style={{
-              background: 'rgba(42,10,10,0.08)',
-              padding: '5px 16px',
-              borderBottom: '1px solid rgba(10,10,15,0.15)',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 10,
-                color: '#5A4A3A',
-                letterSpacing: '0.08em',
-              }}
-            >
-              Issued: 2026 · Active: Ongoing
-            </span>
-          </div>
-
-          {/* Two-column body */}
-          <div style={{ display: 'flex', gap: 0 }}>
-            {/* Left — avatar + barcode */}
-            <div
-              style={{
-                width: 140,
-                flexShrink: 0,
-                borderRight: '1.5px solid rgba(10,10,15,0.15)',
-                padding: '16px 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 12,
-                background: 'rgba(124,106,158,0.06)',
-              }}
-            >
-              <WizardPixel />
-              <BarcodeStripes />
-              <span
-                style={{
-                  fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                  fontSize: 9,
-                  color: '#5A4A3A',
-                  letterSpacing: '0.12em',
-                  textAlign: 'center',
-                }}
-              >
-                23RDGEN-001
-              </span>
-            </div>
-
-            {/* Right — details */}
-            <div style={{ flex: 1, padding: '16px 16px' }}>
-              {(
-                [
-                  ['Name', 'Vrish'],
-                  ['Title', 'Co-Founder & CEO, 23rdGen'],
-                  ['Agency', '23rdGen AI Agency'],
-                  [
-                    'Mission',
-                    'Building the world’s first open marketplace for deployable AI intelligence',
-                  ],
-                  [
-                    'Vision',
-                    'A future where anyone can build, share and earn from AI agents — the builder class economy',
-                  ],
-                ] as [string, string][]
-              ).map(([label, value]) => (
-                <div key={label} style={{ marginBottom: 12 }}>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                      fontSize: 9,
-                      color: '#7C6A9E',
-                      letterSpacing: '0.14em',
-                      textTransform: 'uppercase',
-                      marginBottom: 2,
-                    }}
-                  >
-                    {label}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                      fontSize: 11,
-                      color: '#0A0A0F',
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    {value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Full-width quote */}
-          <div
-            style={{
-              borderTop: '1.5px solid rgba(10,10,15,0.15)',
-              padding: '14px 16px',
-              background: 'rgba(124,106,158,0.05)',
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 11,
-                color: '#2A1A0E',
-                lineHeight: 1.65,
-                margin: 0,
-              }}
-            >
-              &ldquo;23rdGen was built for the builder generation. We believe AI intelligence should
-              be open, deployable, and rewarded. Every agent uploaded is a step toward a world where
-              human creativity scales infinitely through AI.&rdquo;
-            </p>
-          </div>
-
-          {/* Bottom — signature + stamp */}
-          <div
-            style={{
-              borderTop: '1.5px solid rgba(10,10,15,0.15)',
-              padding: '10px 16px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-dm-serif), DM Serif Display, serif',
-                fontSize: 16,
-                color: '#2A1A0E',
-                fontStyle: 'italic',
-              }}
-            >
-              Vrish
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 10,
-                color: '#7C6A9E',
-                border: '1.5px solid #7C6A9E',
-                padding: '3px 8px',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-              }}
-            >
-              VERIFIED BUILDER ■
-            </span>
-          </div>
+      <div onClick={e => e.stopPropagation()} style={{ width: 420, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <FounderIDCard />
+        <div style={{ background: '#F0E6D0', border: '2px solid #0A0A0F', boxShadow: '4px 4px 0px #0A0A0F', padding: 16 }}>
+          <FounderContactForm />
         </div>
-
-        {/* ── Contact form ── */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: '#F0E6D0',
-            border: '2px solid #0A0A0F',
-            boxShadow: '4px 4px 0px #0A0A0F',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 10 }}>
-            <input
-              required
-              placeholder="Your Name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              style={{ ...inputStyle, flex: 1 }}
-            />
-            <input
-              required
-              type="email"
-              placeholder="Your Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              style={{ ...inputStyle, flex: 1 }}
-            />
-          </div>
-          <textarea
-            required
-            placeholder="What are you building?"
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            rows={2}
-            style={{ ...inputStyle, resize: 'vertical', minHeight: 56 }}
-          />
-          <button
-            type="submit"
-            style={{
-              fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-              fontSize: 11,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              fontWeight: 600,
-              background: sent ? '#2A5A2A' : '#0A0A0F',
-              color: sent ? '#A8D8A8' : '#E8E0D0',
-              border: '2px solid #0A0A0F',
-              boxShadow: '3px 3px 0px rgba(10,10,15,0.4)',
-              padding: '10px 0',
-              cursor: 'pointer',
-              transition: 'background 300ms, color 300ms',
-              borderRadius: 0,
-            }}
-          >
-            {sent ? '✓ MESSAGE SENT' : 'SEND TO VRISH →'}
-          </button>
-        </form>
       </div>
     </div>
   )
@@ -499,28 +350,16 @@ export default function Footer() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view')
-          }
-        })
-      },
+      entries => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('in-view') }) },
       { threshold: 0.1 }
     )
-
     colRefs.current.forEach(col => { if (col) observer.observe(col) })
     if (bottomRef.current) observer.observe(bottomRef.current)
-
     return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
-    if (founderOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = founderOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [founderOpen])
 
@@ -528,19 +367,31 @@ export default function Footer() {
     <>
       {founderOpen && <FounderModal onClose={() => setFounderOpen(false)} />}
 
-      <footer style={{
-        background: '#0A0A0F',
-        padding: '80px 6vw 40px',
-        position: 'relative',
-        zIndex: 2,
-      }}>
-        {/* 5-column link grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: 32,
-          marginBottom: 60,
-        }}>
+      <footer style={{ background: '#0A0A0F', padding: '72px 6vw 40px', position: 'relative', zIndex: 2 }}>
+
+        {/* ── Founder section ── */}
+        <div style={{ marginBottom: 64, display: 'flex', gap: 48, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          {/* Left: label + ID card */}
+          <div style={{ flex: '1 1 380px', minWidth: 0 }}>
+            <div style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#7C6A9E', marginBottom: 16 }}>
+              About the Founder
+            </div>
+            <FounderIDCard />
+          </div>
+
+          {/* Right: label + contact form */}
+          <div style={{ flex: '1 1 300px', minWidth: 0 }}>
+            <div style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#7C6A9E', marginBottom: 16 }}>
+              Get in Touch
+            </div>
+            <FounderContactForm />
+          </div>
+        </div>
+
+        <div style={{ height: 1, background: 'rgba(124,106,158,0.15)', marginBottom: 56 }} />
+
+        {/* ── 5-column link grid ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 60 }}>
           {Object.entries(FOOTER_COLS).map(([col, links], colIdx) => (
             <div
               key={col}
@@ -548,14 +399,7 @@ export default function Footer() {
               className="footer-col"
               style={{ transitionDelay: `${colIdx * 80}ms` }}
             >
-              <div style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 10,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                color: '#7C6A9E',
-                marginBottom: 16,
-              }}>
+              <div style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#7C6A9E', marginBottom: 16 }}>
                 {col}
               </div>
               {links.map(([label, href]) => (
@@ -568,17 +412,7 @@ export default function Footer() {
         {/* Ghost wordmark */}
         <div style={{ textAlign: 'center', margin: '60px 0' }}>
           <span
-            style={{
-              fontFamily: 'var(--font-dm-serif), DM Serif Display, serif',
-              fontSize: 'clamp(5rem, 12vw, 10rem)',
-              color: 'rgba(232,224,208,0.06)',
-              animation: 'footer-drift 8s ease-in-out infinite',
-              display: 'inline-block',
-              cursor: 'default',
-              transition: 'color 400ms ease',
-              userSelect: 'none',
-              lineHeight: 1,
-            }}
+            style={{ fontFamily: 'var(--font-dm-serif), DM Serif Display, serif', fontSize: 'clamp(5rem, 12vw, 10rem)', color: 'rgba(232,224,208,0.06)', animation: 'footer-drift 8s ease-in-out infinite', display: 'inline-block', cursor: 'default', transition: 'color 400ms ease', userSelect: 'none', lineHeight: 1 }}
             onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(232,224,208,0.12)')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(232,224,208,0.06)')}
           >
@@ -590,72 +424,27 @@ export default function Footer() {
         <div
           ref={bottomRef}
           className="footer-col"
-          style={{
-            borderTop: '1px solid rgba(124,106,158,0.2)',
-            paddingTop: 24,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-            transitionDelay: '400ms',
-          }}
+          style={{ borderTop: '1px solid rgba(124,106,158,0.2)', paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, transitionDelay: '400ms' }}
         >
-          <span style={{
-            fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-            fontSize: 11,
-            color: '#5A6A7A',
-          }}>
+          <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 11, color: '#5A6A7A' }}>
             © 2026 23rdGen. Open marketplace for deployable intelligence.
           </span>
 
-          <span style={{
-            fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-            fontSize: 10,
-            color: '#3A3A4A',
-            fontStyle: 'italic',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}>
+          <span style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 10, color: '#3A3A4A', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ color: '#7C6A9E', fontStyle: 'normal' }}>♦</span>
             Crafted by Nakshatra Sharma
             <span style={{ color: '#7C6A9E', fontStyle: 'normal' }}>♦</span>
           </span>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {/* About the Founder button */}
             <button
               onClick={() => setFounderOpen(true)}
-              style={{
-                fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace',
-                fontSize: 11,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                background: 'transparent',
-                color: '#7C6A9E',
-                border: '2px solid #7C6A9E',
-                boxShadow: '2px 2px 0px #7C6A9E',
-                padding: '4px 10px',
-                cursor: 'pointer',
-                borderRadius: 0,
-                transition: 'background 150ms, color 150ms',
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = '#7C6A9E'
-                el.style.color = '#E8E0D0'
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = 'transparent'
-                el.style.color = '#7C6A9E'
-              }}
+              style={{ fontFamily: 'var(--font-ibm-mono), IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: '#7C6A9E', border: '2px solid #7C6A9E', boxShadow: '2px 2px 0px #7C6A9E', padding: '4px 10px', cursor: 'pointer', borderRadius: 0, transition: 'background 150ms, color 150ms' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = '#7C6A9E'; el.style.color = '#E8E0D0' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = '#7C6A9E' }}
             >
               ABOUT THE FOUNDER ↗
             </button>
-
-            {/* Social icons */}
             <SocialIcon href="#" label="Twitter / X">
               <path d="M18 6L6 18M6 6l12 12" />
             </SocialIcon>

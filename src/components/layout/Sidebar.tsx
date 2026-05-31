@@ -275,8 +275,8 @@ function SidebarContent({
           <Image
             src="/inspiration/logo.png"
             alt="23rdGen"
-            width={collapsed ? 32 : 110}
-            height={collapsed ? 32 : 32}
+            width={collapsed ? 28 : 78}
+            height={collapsed ? 28 : 22}
             style={{ objectFit: 'contain', objectPosition: 'left center' }}
             priority
           />
