@@ -6,35 +6,26 @@ export interface Database {
       profiles: {
         Row: {
           id: string
-          username: string
-          display_name: string | null
-          bio: string | null
-          avatar_url: string | null
-          pixel_character: string
-          points_total: number
-          points_available: number
+          username: string | null
+          display_name: string
+          avatar_id: string | null
+          points: number
           created_at: string
         }
         Insert: {
           id: string
-          username: string
-          display_name?: string | null
-          bio?: string | null
-          avatar_url?: string | null
-          pixel_character?: string
-          points_total?: number
-          points_available?: number
+          username?: string | null
+          display_name?: string
+          avatar_id?: string | null
+          points?: number
           created_at?: string
         }
         Update: {
           id?: string
-          username?: string
-          display_name?: string | null
-          bio?: string | null
-          avatar_url?: string | null
-          pixel_character?: string
-          points_total?: number
-          points_available?: number
+          username?: string | null
+          display_name?: string
+          avatar_id?: string | null
+          points?: number
           created_at?: string
         }
         Relationships: []
@@ -42,87 +33,131 @@ export interface Database {
       agents: {
         Row: {
           id: string
-          slug: string
-          title: string
-          name: string | null
-          description: string
-          long_description: string | null
-          content: string
-          category: string
-          tags: string[]
-          compatible_with: string[]
-          creator_id: string | null
-          creator_name: string | null
-          pixel_character: string | null
-          deploy_count: number
-          points_per_deploy: number
-          is_free: boolean
-          is_featured: boolean
-          quality_score: number
+          name: string
+          type: string
+          category: string | null
+          description: string | null
+          prompt: string | null
+          code: string | null
+          avatar_id: string | null
+          deployed_count: number
           rating: number
-          gemini_tags: string[]
-          gemini_score: number
-          status: string
+          creator_id: string | null
           created_at: string
-          updated_at: string
         }
         Insert: {
           id?: string
-          slug?: string
-          title?: string
-          name?: string | null
-          description: string
-          long_description?: string | null
-          content: string
-          category: string
-          tags?: string[]
-          compatible_with?: string[]
-          creator_id?: string | null
-          creator_name?: string | null
-          pixel_character?: string | null
-          deploy_count?: number
-          points_per_deploy?: number
-          is_free?: boolean
-          is_featured?: boolean
-          quality_score?: number
+          name: string
+          type: string
+          category?: string | null
+          description?: string | null
+          prompt?: string | null
+          code?: string | null
+          avatar_id?: string | null
+          deployed_count?: number
           rating?: number
-          gemini_tags?: string[]
-          gemini_score?: number
-          status?: string
+          creator_id?: string | null
           created_at?: string
-          updated_at?: string
         }
         Update: {
           id?: string
-          slug?: string
-          title?: string
-          name?: string | null
-          description?: string
-          long_description?: string | null
-          content?: string
-          category?: string
-          tags?: string[]
-          compatible_with?: string[]
-          creator_id?: string | null
-          creator_name?: string | null
-          pixel_character?: string | null
-          deploy_count?: number
-          points_per_deploy?: number
-          is_free?: boolean
-          is_featured?: boolean
-          quality_score?: number
+          name?: string
+          type?: string
+          category?: string | null
+          description?: string | null
+          prompt?: string | null
+          code?: string | null
+          avatar_id?: string | null
+          deployed_count?: number
           rating?: number
-          gemini_tags?: string[]
-          gemini_score?: number
-          status?: string
+          creator_id?: string | null
           created_at?: string
-          updated_at?: string
+        }
+        Relationships: []
+      }
+      deployments: {
+        Row: {
+          id: string
+          agent_id: string
+          user_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          agent_id: string
+          user_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          agent_id?: string
+          user_id?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          id: string
+          agent_id: string
+          user_id: string
+          rating: number
+          body: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          agent_id: string
+          user_id: string
+          rating: number
+          body?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          agent_id?: string
+          user_id?: string
+          rating?: number
+          body?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          id: string
+          agent_id: string
+          from_user_id: string
+          to_creator_id: string
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          agent_id: string
+          from_user_id: string
+          to_creator_id: string
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          agent_id?: string
+          from_user_id?: string
+          to_creator_id?: string
+          body?: string
+          created_at?: string
         }
         Relationships: []
       }
     }
     Views: { [_: string]: never }
-    Functions: { [_: string]: never }
+    Functions: {
+      deploy_agent: {
+        Args: { p_agent_id: string }
+        Returns: number
+      }
+    }
     Enums: { [_: string]: never }
   }
 }

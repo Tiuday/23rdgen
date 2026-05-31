@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import CartoonAvatar, { stableAvatarIdx } from '@/components/mascot/CartoonAvatar'
 
 type TypeFilter = 'all' | 'agent' | 'prompt' | 'skill' | 'workflow' | 'team'
@@ -11,13 +10,13 @@ type SortOption = 'trending' | 'newest' | 'top_rated'
 interface BrowseAgent {
   id: string
   name: string
-  category: string
-  description: string
-  creator_name: string | null
-  deploy_count: number
+  type: string
+  category: string | null
+  description: string | null
+  deployed_count: number
   rating: number
   created_at: string
-  tags: string[] | null
+  creator: { username: string | null; display_name: string } | null
 }
 
 const CATEGORY_BADGE: Record<string, { bg: string; text: string; border: string }> = {
@@ -41,18 +40,18 @@ const TYPE_HEADER: Record<string, string> = {
 const AKT = "'Akt', system-ui, -apple-system, sans-serif"
 
 const MOCK_AGENTS: BrowseAgent[] = [
-  { id: '1', name: 'Code Review Wizard',  category: 'agent',    description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.', creator_name: 'devtools_hq',  deploy_count: 2840, rating: 4.8, created_at: '2026-01-15T00:00:00Z', tags: ['code','review','security'] },
-  { id: '2', name: 'SEO Scribe',          category: 'prompt',   description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a simple keyword list.',          creator_name: 'marketers',    deploy_count: 1650, rating: 4.5, created_at: '2026-02-10T00:00:00Z', tags: ['seo','content','writing'] },
-  { id: '3', name: 'SQL Craftsperson',    category: 'skill',    description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite with clear explanations.',          creator_name: 'dataeng',      deploy_count: 3200, rating: 4.9, created_at: '2026-01-20T00:00:00Z', tags: ['sql','database','data'] },
-  { id: '4', name: 'Research Conductor',  category: 'workflow',  description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',       creator_name: 'researchers',  deploy_count: 890,  rating: 4.3, created_at: '2026-03-01T00:00:00Z', tags: ['research','workflow','reports'] },
-  { id: '5', name: 'Bug Hunter Pro',      category: 'agent',    description: 'Scans code for common bug patterns, off-by-one errors, null pointer risks, and silent runtime exceptions.',         creator_name: 'debuggers',    deploy_count: 1420, rating: 4.6, created_at: '2026-02-28T00:00:00Z', tags: ['debugging','testing','quality'] },
-  { id: '6', name: 'Explorer Bot',        category: 'browser',  description: 'Automates web navigation, form filling, data extraction, and screenshot capture across any website.',               creator_name: 'automators',   deploy_count: 1100, rating: 4.4, created_at: '2026-03-15T00:00:00Z', tags: ['automation','scraping','web'] },
-  { id: '7', name: 'Cold Email Machine',  category: 'prompt',   description: 'Writes high-converting cold email sequences personalized to any industry, pain point, or buyer persona.',           creator_name: 'salescraft',   deploy_count: 2100, rating: 4.7, created_at: '2026-02-05T00:00:00Z', tags: ['email','sales','copywriting'] },
-  { id: '8', name: 'LinkedIn Post Pro',   category: 'prompt',   description: 'Generates viral LinkedIn posts that drive engagement: hooks, stories, carousels, and thought leadership content.',  creator_name: 'contentguild', deploy_count: 1780, rating: 4.6, created_at: '2026-03-10T00:00:00Z', tags: ['linkedin','social','content'] },
-  { id: '9', name: 'Market Radar',        category: 'agent',    description: 'Tracks competitor moves, industry shifts, and emerging trends across markets. Weekly briefing format.',             creator_name: 'strategos',    deploy_count: 980,  rating: 4.4, created_at: '2026-01-28T00:00:00Z', tags: ['research','market','strategy'] },
-  { id: '10', name: 'Pitch Deck Writer',  category: 'workflow',  description: 'Creates investor-ready pitch decks from a simple brief. Covers problem, solution, traction, and ask.',            creator_name: 'foundry',      deploy_count: 1340, rating: 4.5, created_at: '2026-03-20T00:00:00Z', tags: ['pitch','startup','investor'] },
-  { id: '11', name: 'Brand Voice Guide',  category: 'skill',    description: 'Analyzes your existing content and synthesizes a reusable brand voice guide with tone, vocabulary, and examples.',  creator_name: 'brandcraft',   deploy_count: 760,  rating: 4.3, created_at: '2026-02-18T00:00:00Z', tags: ['branding','voice','content'] },
-  { id: '12', name: 'Content Team',       category: 'team',     description: 'A coordinated 4-agent team: SEO writer, social scheduler, cold email specialist, and research summarizer.',         creator_name: '23rdgen',      deploy_count: 3500, rating: 4.9, created_at: '2026-01-10T00:00:00Z', tags: ['team','content','marketing'] },
+  { id: '1', name: 'Code Review Wizard',  type: 'agent',    category: 'engineering', description: 'Deeply analyzes pull requests for bugs, security vulnerabilities, and code quality improvements across any language.', creator: { username: 'devtools_hq',  display_name: 'devtools_hq'  }, deployed_count: 2840, rating: 4.8, created_at: '2026-01-15T00:00:00Z' },
+  { id: '2', name: 'SEO Scribe',          type: 'prompt',   category: 'writing',    description: 'Generates SEO-optimized blog posts, meta descriptions, and landing page copy from a simple keyword list.',           creator: { username: 'marketers',    display_name: 'marketers'    }, deployed_count: 1650, rating: 4.5, created_at: '2026-02-10T00:00:00Z' },
+  { id: '3', name: 'SQL Craftsperson',    type: 'skill',    category: 'data',       description: 'Translates natural language into optimized SQL for PostgreSQL, MySQL, and SQLite with clear explanations.',           creator: { username: 'dataeng',      display_name: 'dataeng'      }, deployed_count: 3200, rating: 4.9, created_at: '2026-01-20T00:00:00Z' },
+  { id: '4', name: 'Research Conductor',  type: 'workflow', category: 'research',   description: 'Multi-step workflow that searches, summarizes, and formats research into structured reports with citations.',         creator: { username: 'researchers',  display_name: 'researchers'  }, deployed_count: 890,  rating: 4.3, created_at: '2026-03-01T00:00:00Z' },
+  { id: '5', name: 'Bug Hunter Pro',      type: 'agent',    category: 'engineering',description: 'Scans code for common bug patterns, off-by-one errors, null pointer risks, and silent runtime exceptions.',         creator: { username: 'debuggers',    display_name: 'debuggers'    }, deployed_count: 1420, rating: 4.6, created_at: '2026-02-28T00:00:00Z' },
+  { id: '6', name: 'Cold Email Machine',  type: 'prompt',   category: 'sales',      description: 'Writes high-converting cold email sequences personalized to any industry, pain point, or buyer persona.',           creator: { username: 'salescraft',   display_name: 'salescraft'   }, deployed_count: 2100, rating: 4.7, created_at: '2026-02-05T00:00:00Z' },
+  { id: '7', name: 'LinkedIn Post Pro',   type: 'prompt',   category: 'marketing',  description: 'Generates viral LinkedIn posts that drive engagement: hooks, stories, carousels, and thought leadership content.',  creator: { username: 'contentguild', display_name: 'contentguild' }, deployed_count: 1780, rating: 4.6, created_at: '2026-03-10T00:00:00Z' },
+  { id: '8', name: 'Market Radar',        type: 'agent',    category: 'research',   description: 'Tracks competitor moves, industry shifts, and emerging trends across markets. Weekly briefing format.',             creator: { username: 'strategos',    display_name: 'strategos'    }, deployed_count: 980,  rating: 4.4, created_at: '2026-01-28T00:00:00Z' },
+  { id: '9', name: 'Pitch Deck Writer',   type: 'workflow', category: 'business',   description: 'Creates investor-ready pitch decks from a simple brief. Covers problem, solution, traction, and ask.',             creator: { username: 'foundry',      display_name: 'foundry'      }, deployed_count: 1340, rating: 4.5, created_at: '2026-03-20T00:00:00Z' },
+  { id: '10', name: 'Brand Voice Guide',  type: 'skill',    category: 'marketing',  description: 'Analyzes your existing content and synthesizes a reusable brand voice guide with tone, vocabulary, and examples.',  creator: { username: 'brandcraft',   display_name: 'brandcraft'   }, deployed_count: 760,  rating: 4.3, created_at: '2026-02-18T00:00:00Z' },
+  { id: '11', name: 'Content Team',       type: 'team',     category: 'marketing',  description: 'A coordinated 4-agent team: SEO writer, social scheduler, cold email specialist, and research summarizer.',         creator: { username: 'nakshatra',    display_name: 'Nakshatra Sharma' }, deployed_count: 3500, rating: 4.9, created_at: '2026-01-10T00:00:00Z' },
+  { id: '12', name: 'Meeting Notes',      type: 'skill',    category: 'productivity',description: 'Converts a raw meeting transcript into structured decisions, action items with owners, and open questions.',         creator: { username: 'nakshatra',    display_name: 'Nakshatra Sharma' }, deployed_count: 820,  rating: 4.6, created_at: '2026-03-05T00:00:00Z' },
 ]
 
 const TYPE_TABS: { id: TypeFilter; label: string }[] = [
@@ -119,29 +118,23 @@ function BrowseContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const categoryParam = searchParams.get('category') || ''
+  const qParam = searchParams.get('q') || ''
 
   const [agents, setAgents] = useState<BrowseAgent[]>([])
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [sort, setSort] = useState<SortOption>('trending')
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(qParam)
 
   useEffect(() => {
     async function load() {
       try {
-        const supabase = createClient()
-        const { data, error } = await supabase
-          .from('agents')
-          .select('id, name, category, description, creator_name, deploy_count, rating, created_at, tags')
-          .eq('status', 'active')
-        if (error || !data || data.length === 0) {
+        const res = await fetch('/api/agents')
+        const data = await res.json()
+        if (!res.ok || !Array.isArray(data) || data.length === 0) {
           setAgents(MOCK_AGENTS)
         } else {
-          setAgents(data.map(row => ({
-            ...row,
-            name: (row as BrowseAgent & { title?: string }).name ?? (row as BrowseAgent & { title?: string }).title ?? 'Untitled',
-            rating: (row as BrowseAgent).rating ?? 0,
-          })) as BrowseAgent[])
+          setAgents(data as BrowseAgent[])
         }
       } catch {
         setAgents(MOCK_AGENTS)
@@ -156,18 +149,18 @@ function BrowseContent() {
     let result = agents
 
     if (typeFilter !== 'all') {
-      result = result.filter(a => a.category === typeFilter)
+      result = result.filter(a => a.type === typeFilter)
     }
 
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter(a =>
-        a.name.toLowerCase().includes(q) || a.description.toLowerCase().includes(q)
+        a.name.toLowerCase().includes(q) || (a.description ?? '').toLowerCase().includes(q)
       )
     }
 
     const sorted = [...result]
-    if (sort === 'trending') sorted.sort((a, b) => b.deploy_count - a.deploy_count)
+    if (sort === 'trending') sorted.sort((a, b) => b.deployed_count - a.deployed_count)
     else if (sort === 'newest') sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     else if (sort === 'top_rated') sorted.sort((a, b) => b.rating - a.rating)
 
@@ -302,7 +295,7 @@ function BrowseContent() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
             {filtered.map(agent => {
-              const headerBg = TYPE_HEADER[agent.category] ?? '#F5D76E'
+              const headerBg = TYPE_HEADER[agent.type] ?? '#F5D76E'
               const avatarIdx = stableAvatarIdx(agent.id)
 
               return (
@@ -352,7 +345,7 @@ function BrowseContent() {
                           color: 'rgba(10,10,15,0.55)',
                         }}
                       >
-                        {agent.category}
+                        {agent.type}
                       </span>
                     </div>
 
@@ -394,11 +387,11 @@ function BrowseContent() {
                           fontSize: 11, color: '#8A7A6A',
                         }}
                       >
-                        <span>{agent.deploy_count.toLocaleString()} deploys</span>
+                        <span>{agent.deployed_count.toLocaleString()} deploys</span>
                         <span>·</span>
                         <span>★ {agent.rating}</span>
                         <span>·</span>
-                        <span>@{agent.creator_name ?? 'anon'}</span>
+                        <span>@{agent.creator?.display_name ?? agent.creator?.username ?? 'anon'}</span>
                       </div>
 
                       {/* Deploy button — brutalist inside rounded card */}
@@ -416,6 +409,14 @@ function BrowseContent() {
                           cursor: 'pointer',
                           width: '100%',
                           transition: 'transform 60ms ease, box-shadow 60ms ease',
+                        }}
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          await fetch(`/api/agents/${agent.id}/deploy`, { method: 'POST' })
+                          setAgents(prev => prev.map(a =>
+                            a.id === agent.id ? { ...a, deployed_count: a.deployed_count + 1 } : a
+                          ))
                         }}
                         onMouseEnter={e => {
                           const el = e.currentTarget as HTMLButtonElement

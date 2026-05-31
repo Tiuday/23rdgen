@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { signup } from '@/app/(auth)/actions'
 
 const MONO = 'var(--font-ibm-mono), IBM Plex Mono, monospace'
 const SERIF = 'var(--font-dm-serif), DM Serif Display, serif'
@@ -29,14 +29,10 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${location.origin}/auth/callback` },
-    })
+    const formData = new FormData(e.target as HTMLFormElement)
+    const result = await signup(formData)
     setLoading(false)
-    if (authError) { setError(authError.message) }
+    if (result?.error) { setError(result.error) }
     else { setDone(true) }
   }
 
@@ -147,6 +143,7 @@ export default function SignupPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -162,6 +159,7 @@ export default function SignupPage() {
                 </label>
                 <input
                   type="password"
+                  name="password"
                   required
                   minLength={6}
                   value={password}

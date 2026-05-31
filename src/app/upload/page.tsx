@@ -1,41 +1,24 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 
-type Category = 'agent' | 'prompt' | 'skill' | 'workflow'
+type AgentType = 'agent' | 'prompt' | 'skill' | 'workflow' | 'team'
 
 interface FormState {
   name: string
-  category: Category
+  type: AgentType
   description: string
   content: string
-  creator_name: string
 }
 
 interface FieldErrors {
   name?: string
-  category?: string
+  type?: string
   description?: string
   content?: string
-  creator_name?: string
 }
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
-
-const PIXEL_CHAR: Record<Category, string> = {
-  agent: 'robot',
-  prompt: 'scroll',
-  skill: 'gear',
-  workflow: 'arrows',
-}
-
-function makeSlug(name: string): string {
-  return (
-    name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 48) +
-    '-' + Date.now().toString(36)
-  )
-}
 
 const LABEL_STYLE: React.CSSProperties = {
   display: 'block',
@@ -69,7 +52,7 @@ const ERR_STYLE: React.CSSProperties = {
 }
 
 export default function UploadPage() {
-  const [form, setForm] = useState<FormState>({ name: '', category: 'agent', description: '', content: '', creator_name: '' })
+  const [form, setForm] = useState<FormState>({ name: '', type: 'agent', description: '', content: '' })
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<SubmitStatus>('idle')
   const [publishedId, setPublishedId] = useState<string | null>(null)
@@ -87,7 +70,6 @@ export default function UploadPage() {
     if (!form.description.trim()) e.description = 'Description is required'
     if (!form.content.trim()) e.content = 'Content is required'
     else if (form.content.trim().length < 20) e.content = 'Content must be at least 20 characters'
-    if (!form.creator_name.trim()) e.creator_name = 'Your name is required'
     return e
   }
 
@@ -100,13 +82,18 @@ export default function UploadPage() {
     setSubmitError('')
 
     try {
-      const supabase = createClient()
-      const slug = makeSlug(form.name)
-      const { data, error } = await supabase
-        .from('agents')
-        .insert({ name: form.name, title: form.name, category: form.category, description: form.description, content: form.content, creator_name: form.creator_name, slug, pixel_character: PIXEL_CHAR[form.category], deploy_count: 0, status: 'active' })
-        .select('id').single()
-      if (error) { setSubmitError(error.message); setStatus('error') }
+      const res = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          type: form.type,
+          description: form.description,
+          prompt: form.content,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setSubmitError(data.error ?? 'Something went wrong'); setStatus('error') }
       else { setPublishedId(data.id); setStatus('success') }
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong')
@@ -192,22 +179,23 @@ export default function UploadPage() {
               {errors.name && <p style={ERR_STYLE}>{errors.name}</p>}
             </div>
 
-            {/* Category */}
+            {/* Type */}
             <div>
-              <label style={LABEL_STYLE}>Category</label>
+              <label style={LABEL_STYLE}>Type</label>
               <select
-                value={form.category}
-                onChange={e => set('category', e.target.value as Category)}
-                onFocus={() => setFocused('category')}
+                value={form.type}
+                onChange={e => set('type', e.target.value as AgentType)}
+                onFocus={() => setFocused('type')}
                 onBlur={() => setFocused(null)}
-                style={{ ...fieldStyle('category', !!errors.category), cursor: 'pointer', appearance: 'none' }}
+                style={{ ...fieldStyle('type', !!errors.type), cursor: 'pointer', appearance: 'none' }}
               >
                 <option value="agent">Agent</option>
                 <option value="prompt">Prompt</option>
                 <option value="skill">Skill</option>
                 <option value="workflow">Workflow</option>
+                <option value="team">Team</option>
               </select>
-              {errors.category && <p style={ERR_STYLE}>{errors.category}</p>}
+              {errors.type && <p style={ERR_STYLE}>{errors.type}</p>}
             </div>
 
             {/* Description */}
@@ -238,21 +226,6 @@ export default function UploadPage() {
                 style={{ ...fieldStyle('content', !!errors.content), resize: 'none' }}
               />
               {errors.content && <p style={ERR_STYLE}>{errors.content}</p>}
-            </div>
-
-            {/* Creator name */}
-            <div>
-              <label style={LABEL_STYLE}>Your name</label>
-              <input
-                type="text"
-                value={form.creator_name}
-                onChange={e => set('creator_name', e.target.value)}
-                onFocus={() => setFocused('creator_name')}
-                onBlur={() => setFocused(null)}
-                placeholder="How should we credit you?"
-                style={fieldStyle('creator_name', !!errors.creator_name)}
-              />
-              {errors.creator_name && <p style={ERR_STYLE}>{errors.creator_name}</p>}
             </div>
 
             {/* Submit error */}

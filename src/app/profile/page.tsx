@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CartoonAvatar, { AVATAR_NAMES } from '@/components/mascot/CartoonAvatar'
+import { createClient } from '@/lib/supabase/client'
 
 type Tab = 'agents' | 'saved' | 'activity' | 'teams'
 
@@ -72,10 +73,33 @@ const TABS: { id: Tab; label: string }[] = [
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<Tab>('agents')
-  const [avatarIdx, setAvatarIdx] = useState(0) // 0 = Wizard by default
+  const [avatarIdx, setAvatarIdx] = useState(0)
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [username, setUsername] = useState('builder_anon')
   const [editingName, setEditingName] = useState(false)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [profileData, setProfileData] = useState<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [myAgents, setMyAgents] = useState<any[]>([])
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      const { data: agents } = await supabase.from('agents').select('*').eq('creator_id', user.id).order('created_at', { ascending: false })
+
+      if (prof) {
+        setProfileData(prof)
+        setUsername(prof.username ?? prof.display_name ?? 'anonymous')
+      }
+      if (agents) setMyAgents(agents)
+    }
+    load()
+  }, [])
 
   const accentBg   = AVATAR_ACCENTS[avatarIdx]
   const accentText = AVATAR_ACCENT_TEXT[avatarIdx]
@@ -201,10 +225,10 @@ export default function ProfilePage() {
               )}
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 {[
-                  { label: 'Agents',  value: 2   },
-                  { label: 'Deploys', value: 229 },
-                  { label: 'Points',  value: 850 },
-                  { label: 'Teams',   value: 1   },
+                  { label: 'Agents',  value: myAgents.length || MOCK_AGENTS.length },
+                  { label: 'Deploys', value: myAgents.reduce((s: number, a: { deployed_count?: number }) => s + (a.deployed_count ?? 0), 0) || 229 },
+                  { label: 'Points',  value: profileData?.points ?? 850 },
+                  { label: 'Teams',   value: myAgents.filter((a: { type: string }) => a.type === 'team').length || 1 },
                 ].map(stat => (
                   <div key={stat.label}>
                     <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 700, color: '#0A0A0F' }}>{stat.value}</div>
@@ -247,8 +271,8 @@ export default function ProfilePage() {
       {activeTab === 'agents' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 16 }}>
-            {MOCK_AGENTS.map(agent => {
-              const headerBg = TYPE_HEADER[agent.category] ?? '#F5D76E'
+            {(myAgents.length > 0 ? myAgents : MOCK_AGENTS).map((agent, i) => {
+              const headerBg = TYPE_HEADER[agent.type ?? agent.category] ?? '#F5D76E'
               return (
                 <div
                   key={agent.id}
@@ -265,14 +289,14 @@ export default function ProfilePage() {
                   onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ''; el.style.boxShadow = '4px 4px 0 #0A0A0F' }}
                 >
                   <div style={{ background: headerBg, padding: '18px 18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                    <CartoonAvatar index={parseInt(agent.id) - 1} size={70} />
+                    <CartoonAvatar index={i % 12} size={70} />
                     <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(10,10,15,0.5)' }}>
-                      {agent.category}
+                      {agent.type ?? agent.category}
                     </span>
                   </div>
                   <div style={{ padding: '14px 16px 16px' }}>
                     <div style={{ fontFamily: AKT, fontSize: 14, fontWeight: 700, color: '#0A0A0F', marginBottom: 6 }}>{agent.name}</div>
-                    <div style={{ fontFamily: MONO, fontSize: 11, color: '#C4622D', fontWeight: 600, marginBottom: 10 }}>{agent.deploys} deploys</div>
+                    <div style={{ fontFamily: MONO, fontSize: 11, color: '#C4622D', fontWeight: 600, marginBottom: 10 }}>{(agent.deployed_count ?? agent.deploys ?? 0).toLocaleString()} deploys</div>
                     <button style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'transparent', color: '#0A0A0F', border: '2px solid #0A0A0F', padding: '5px 14px', cursor: 'pointer', width: '100%', boxShadow: '2px 2px 0 #0A0A0F', transition: 'transform 60ms ease, box-shadow 60ms ease' }}
                       onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = 'translate(1px,1px)'; el.style.boxShadow = '1px 1px 0 #0A0A0F' }}
                       onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = ''; el.style.boxShadow = '2px 2px 0 #0A0A0F' }}

@@ -1,8 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { login } from '@/app/(auth)/actions'
 
 const MONO = 'var(--font-ibm-mono), IBM Plex Mono, monospace'
 const SERIF = 'var(--font-dm-serif), DM Serif Display, serif'
@@ -19,7 +18,6 @@ const DOT_BG: React.CSSProperties = {
 }
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -30,15 +28,11 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    const formData = new FormData(e.target as HTMLFormElement)
+    const result = await login(formData)
     setLoading(false)
-    if (authError) {
-      setError(authError.message)
-    } else {
-      router.push('/dashboard')
-      router.refresh()
-    }
+    if (result?.error) setError(result.error)
+    // On success the server action redirects — no client navigation needed.
   }
 
   function inputStyle(name: string): React.CSSProperties {
@@ -120,6 +114,7 @@ export default function LoginPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -136,6 +131,7 @@ export default function LoginPage() {
                 </label>
                 <input
                   type="password"
+                  name="password"
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
